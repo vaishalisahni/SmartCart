@@ -1,0 +1,11 @@
+const express = require('express');
+const r = express.Router();
+const c = require('../controllers/userController');
+const { protect } = require('../middleware/auth');
+r.put('/profile', protect, c.updateProfile);
+r.post('/address', protect, c.addAddress);
+r.put('/address/:addressId', protect, c.updateAddress);
+r.delete('/address/:addressId', protect, c.deleteAddress);
+r.post('/recently-viewed', protect, c.addRecentlyViewed);
+r.get('/recently-viewed', protect, c.getRecentlyViewed);
+module.exports = r;
