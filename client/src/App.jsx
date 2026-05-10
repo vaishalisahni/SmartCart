@@ -23,6 +23,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import NotFoundPage from './pages/NotFoundPage';
+import GoogleAuthSuccess from './pages/GoogleAuthSuccess';
 
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -77,6 +78,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
 
         {/* All other pages — WITH navbar */}
         <Route path="/*" element={

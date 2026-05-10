@@ -21,6 +21,17 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const session = require('express-session');
+const passport = require('./utils/passport');
+
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Rate limiting
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { message: 'Too many attempts, try again later.' } });
