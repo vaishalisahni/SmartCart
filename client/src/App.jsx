@@ -24,6 +24,8 @@ import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import NotFoundPage from './pages/NotFoundPage';
 import GoogleAuthSuccess from './pages/GoogleAuthSuccess';
+import LoyaltyPage from './pages/LoyaltyPage';
+import LiveChat from './components/chat/LiveChat';
 
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -32,6 +34,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminAddProduct from './pages/admin/AdminAddProduct';
+import AdminChat from './pages/admin/AdminChat';
 
 const ProtectedRoute = ({ children }) => {
   const { user, initialized } = useSelector(s => s.auth);
@@ -72,6 +75,7 @@ export default function App() {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="chat" element={<AdminChat />} />
         </Route>
 
         {/* Auth pages — NO navbar, fullscreen */}
@@ -97,9 +101,11 @@ export default function App() {
                 <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                 <Route path="*" element={<NotFoundPage />} />
+                <Route path="/loyalty" element={<ProtectedRoute><LoyaltyPage /></ProtectedRoute>} />
               </Routes>
             </main>
             <Footer />
+            <LiveChat />
           </div>
         } />
       </Routes>

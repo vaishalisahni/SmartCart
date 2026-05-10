@@ -53,6 +53,9 @@ exports.placeOrder = async (req, res) => {
     couponCode: couponCode || '',
     statusHistory: [{ status: 'placed', note: 'Order placed successfully' }],
   });
+  
+  const { earnPoints } = require('./loyaltyController');
+  await earnPoints(order._id, req.user._id, totalPrice);
 
   try { await sendOrderConfirmationEmail(req.user.email, order); } catch (e) { console.log('Email failed:', e.message); }
 

@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -9,6 +11,13 @@ require('dotenv').config();
 require('express-async-errors');
 
 const app = express();
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: [process.env.CLIENT_URL || 'http://localhost:5173'],
+    credentials: true,
+  },
+});
 
 // Security middleware
 app.use(helmet());
@@ -52,6 +61,10 @@ app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
+app.use('/api/chat', require('./routes/chatRoutes'));
+app.use('/api/loyalty', require('./routes/loyaltyRoutes'));
+
+require('./chat/chatHandler')(io);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date() }));
@@ -68,6 +81,5 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB Connected');
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  })
-  .catch(err => { console.error('❌ DB Error:', err); process.exit(1); });
+    httpServer.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  });

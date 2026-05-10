@@ -12,6 +12,22 @@ exports.register = async (req, res) => {
   const { accessToken, refreshToken } = generateTokens(user._id);
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
+  // Generate referral code
+  const { nanoid } = require('nanoid'); // npm install nanoid@3
+  user.referralCode = nanoid(8).toUpperCase();
+  await user.save({ validateBeforeSave: false });
+
+  // Handle referral
+  const { ref } = req.body;
+  if (ref) {
+    const referrer = await User.findOne({ referralCode: ref });
+    if (referrer) {
+      user.referredBy = referrer._id;
+      await user.save({ validateBeforeSave: false });
+      const { addReferralPoints } = require('./loyaltyController');
+      await addReferralPoints(referrer._id);
+    }
+  }
   setTokenCookies(res, accessToken, refreshToken);
   res.status(201).json({ success: true, accessToken, user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar } });
 };

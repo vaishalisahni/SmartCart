@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { FiGrid, FiPackage, FiShoppingBag, FiUsers, FiTag, FiLogOut, FiShoppingCart } from 'react-icons/fi';
+import { FiGrid, FiPackage, FiShoppingBag, FiUsers, FiTag, FiLogOut, FiShoppingCart, FiMessageCircle } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
@@ -10,6 +10,7 @@ const links = [
   { to: '/admin/orders', label: 'Orders', icon: <FiPackage size={18} /> },
   { to: '/admin/users', label: 'Users', icon: <FiUsers size={18} /> },
   { to: '/admin/coupons', label: 'Coupons', icon: <FiTag size={18} /> },
+  { to: '/admin/chat', label: 'Live Chat', icon: <FiMessageCircle size={18} /> },
 ];
 
 export default function AdminLayout() {
