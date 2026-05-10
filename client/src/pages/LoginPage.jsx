@@ -60,11 +60,6 @@ export function LoginPage() {
           </div>
         </div>
         <button type="submit" disabled={loading} className="btn-primary w-full py-2.5">{loading ? 'Logging in...' : 'Login'}</button>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-xs text-gray-500">
-          <p className="font-medium mb-1">Demo Accounts:</p>
-          <p>Admin: admin@smartcart.com / admin123</p>
-          <p>User: user@smartcart.com / user123</p>
-        </div>
         <p className="text-center text-sm">Don't have an account? <Link to="/register" className="text-primary-600 font-semibold hover:underline">Register</Link></p>
       </form>
     </AuthLayout>

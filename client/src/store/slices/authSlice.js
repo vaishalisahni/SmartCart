@@ -22,7 +22,9 @@ export const loadUser = createAsyncThunk('auth/me', async (_, { rejectWithValue 
   try {
     const { data } = await API.get('/auth/me');
     return data.user;
-  } catch { return rejectWithValue(null); }
+  } catch {
+    return rejectWithValue(null); // silent — user just isn't logged in
+  }
 });
 
 export const logoutUser = createAsyncThunk('auth/logout', async () => {

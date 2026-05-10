@@ -1,0 +1,5 @@
+/* Add to index.css */
+/* label helper used in admin forms */
+.label {
+  @apply text-sm font-medium mb-1 block text-gray-700 dark:text-gray-300;
+}
