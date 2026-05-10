@@ -98,7 +98,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="py-5" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="page-container flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
-          <p>© {year} SmartCart — B.Tech AI &amp; ML Major Project | Shivalik College of Engineering</p>
+          <p>© {year} SmartCart</p>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-white/70">
               <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
