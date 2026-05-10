@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary: teal-indigo — modern, trustworthy e-commerce feel
+        // Primary: teal — modern, trustworthy e-commerce feel
         primary: {
           50:  '#eef7f6',
           100: '#d5eeec',
@@ -30,19 +30,20 @@ export default {
           600: '#d97706',
           700: '#b45309',
         },
-        // Neutral grays — used for ALL surfaces (bg, cards, text)
+        // Teal-tinted surface grays — used for ALL surfaces (bg, cards, text)
+        // Dark mode uses teal-tinted darks instead of cold blue-grays
         surface: {
-          50:  '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+          50:  '#f8fafa',
+          100: '#f0f5f5',
+          200: '#ddeaea',
+          300: '#bdd4d3',
+          400: '#8fb5b3',
+          500: '#5f9290',
+          600: '#3d706e',
+          700: '#2a5250',
+          800: '#1c3836',  // dark mode cards
+          900: '#122828',  // dark mode nav/sidebar
+          950: '#0a1f1e',  // dark mode page bg — deep teal, not navy
         },
       },
       fontFamily: {

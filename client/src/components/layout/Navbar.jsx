@@ -70,8 +70,8 @@ export default function Navbar() {
     <>
       <header className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 dark:bg-surface-900/95 backdrop-blur-md shadow-soft border-b border-surface-200/80 dark:border-surface-800/80'
-          : 'bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800'
+          ? 'bg-white/95 dark:bg-surface-900/95 backdrop-blur-md shadow-soft border-b border-surface-200/80 dark:border-surface-700/80'
+          : 'bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-700'
       }`}>
 
         {/* ── Main bar ── */}
@@ -107,7 +107,7 @@ export default function Navbar() {
                 className="w-full pl-10 pr-10 py-2.5 rounded-l-xl
                            bg-surface-100 dark:bg-surface-800
                            border border-surface-200 dark:border-surface-700
-                           focus:border-primary-400 focus:bg-white dark:focus:bg-surface-800
+                           focus:border-primary-400 focus:bg-white dark:focus:bg-surface-700
                            outline-none text-sm transition-all duration-200
                            placeholder:text-surface-400
                            text-surface-900 dark:text-surface-100"
@@ -149,7 +149,7 @@ export default function Navbar() {
             {/* Wishlist */}
             {user && (
               <Link to="/wishlist" className="btn-ghost p-2 hidden sm:flex" aria-label="Wishlist">
-                <FiHeart className="text-surface-500 dark:text-surface-400" size={18} />
+                <FiHeart className="text-surface-500 dark:text-surface-300" size={18} />
               </Link>
             )}
 
@@ -173,7 +173,7 @@ export default function Navbar() {
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
                     {user.name?.[0]?.toUpperCase()}
                   </div>
-                  <span className="text-sm font-semibold hidden md:block max-w-[80px] truncate text-surface-700 dark:text-surface-300">
+                  <span className="text-sm font-semibold hidden md:block max-w-[80px] truncate text-surface-700 dark:text-surface-200">
                     {user.name?.split(' ')[0]}
                   </span>
                   <FiChevronDown size={13} className={`text-surface-400 transition-transform hidden md:block ${userMenu ? 'rotate-180' : ''}`} />
@@ -181,31 +181,31 @@ export default function Navbar() {
 
                 {userMenu && (
                   <div className="absolute right-0 mt-2 w-52 card py-1 shadow-soft z-50 animate-fade-in">
-                    <div className="px-4 py-2.5 border-b border-surface-100 dark:border-surface-800">
+                    <div className="px-4 py-2.5 border-b border-surface-100 dark:border-surface-700">
                       <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{user.name}</p>
                       <p className="text-xs text-surface-400 truncate">{user.email}</p>
                     </div>
-                    <Link to="/profile"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors">
+                    <Link to="/profile"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors">
                       <FiUser size={14} className="text-surface-400" /> Profile
                     </Link>
-                    <Link to="/orders"   className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors">
+                    <Link to="/orders"   className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors">
                       <FiPackage size={14} className="text-surface-400" /> My Orders
                     </Link>
-                    <Link to="/loyalty"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-amber-600 dark:text-amber-500">
+                    <Link to="/loyalty"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-amber-600 dark:text-amber-400">
                       <FiAward size={14} /> Rewards
                     </Link>
                     {user.role === 'admin' && (
-                      <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-primary-600 dark:text-primary-400">
+                      <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-primary-600 dark:text-primary-400">
                         <FiSettings size={14} /> Admin Panel
                       </Link>
                     )}
                     <div className="flex items-center justify-between px-4 py-2.5 sm:hidden">
-                      <span className="text-sm text-surface-600 dark:text-surface-400">Dark mode</span>
+                      <span className="text-sm text-surface-600 dark:text-surface-300">Dark mode</span>
                       <button onClick={() => dispatch(toggleDarkMode())}>
                         {darkMode ? <FiSun className="text-amber-400" size={16} /> : <FiMoon size={16} className="text-surface-500" />}
                       </button>
                     </div>
-                    <div className="border-t border-surface-100 dark:border-surface-800 mt-1" />
+                    <div className="border-t border-surface-100 dark:border-surface-700 mt-1" />
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 w-full transition-colors"
@@ -287,7 +287,7 @@ export default function Navbar() {
                 <Link
                   key={cat}
                   to={`/products?search=${encodeURIComponent(cat)}`}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"
                 >
                   {cat}
                 </Link>
@@ -297,10 +297,10 @@ export default function Navbar() {
                 <>
                   <div className="divider my-4" />
                   <p className="text-xs text-surface-400 font-bold uppercase tracking-widest mb-3 px-2">Account</p>
-                  <Link to="/profile"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"><FiUser size={16} /> Profile</Link>
-                  <Link to="/orders"   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"><FiPackage size={16} /> My Orders</Link>
-                  <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"><FiHeart size={16} /> Wishlist</Link>
-                  <Link to="/loyalty"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-amber-600 transition-colors"><FiAward size={16} /> Rewards</Link>
+                  <Link to="/profile"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiUser size={16} /> Profile</Link>
+                  <Link to="/orders"   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiPackage size={16} /> My Orders</Link>
+                  <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiHeart size={16} /> Wishlist</Link>
+                  <Link to="/loyalty"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors"><FiAward size={16} /> Rewards</Link>
                 </>
               )}
             </div>
