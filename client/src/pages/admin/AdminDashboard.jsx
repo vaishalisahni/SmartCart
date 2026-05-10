@@ -5,14 +5,15 @@ import { Link } from 'react-router-dom';
 import API from '../../services/api';
 import { PageLoader } from '../../components/ui/index';
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
 const STATUS_COLORS = {
-  placed: 'bg-primary-100 text-primary-700',
-  confirmed: 'bg-teal-100 text-teal-700',
-  packed: 'bg-yellow-100 text-yellow-700',
-  shipped: 'bg-orange-100 text-orange-700',
-  delivered: 'bg-green-100 text-green-700',
-  cancelled: 'bg-red-100 text-red-700',
+  placed:    'bg-primary-100 text-primary-700 dark:bg-primary-900/60 dark:text-primary-300',
+  confirmed: 'bg-teal-100 text-teal-700 dark:bg-teal-900/60 dark:text-teal-300',
+  packed:    'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300',
+  shipped:   'bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-300',
+  delivered: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300',
+  cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300',
 };
 
 export default function AdminDashboard() {
@@ -33,24 +34,26 @@ export default function AdminDashboard() {
   }));
 
   const stats = [
-    { label: 'Total Users',    value: data.stats.totalUsers,                      icon: <FiUsers size={22} />,      color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20' },
-    { label: 'Total Products', value: data.stats.totalProducts,                   icon: <FiShoppingBag size={22} />, color: 'text-purple-500',  bg: 'bg-purple-50 dark:bg-purple-900/20' },
-    { label: 'Total Orders',   value: data.stats.totalOrders,                     icon: <FiPackage size={22} />,    color: 'text-orange-500',  bg: 'bg-orange-50 dark:bg-orange-900/20' },
-    { label: 'Total Revenue',  value: `₹${data.stats.totalRevenue?.toLocaleString()}`, icon: <FiDollarSign size={22} />, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+    { label: 'Total Users',    value: data.stats.totalUsers,                            icon: <FiUsers size={20} />,       color: 'text-primary-600 dark:text-primary-400',  bg: 'bg-primary-50 dark:bg-primary-900/40' },
+    { label: 'Total Products', value: data.stats.totalProducts,                         icon: <FiShoppingBag size={20} />, color: 'text-purple-600 dark:text-purple-400',    bg: 'bg-purple-50 dark:bg-purple-900/40' },
+    { label: 'Total Orders',   value: data.stats.totalOrders,                           icon: <FiPackage size={20} />,     color: 'text-amber-600 dark:text-amber-400',      bg: 'bg-amber-50 dark:bg-amber-900/40' },
+    { label: 'Total Revenue',  value: `₹${data.stats.totalRevenue?.toLocaleString('en-IN')}`, icon: <FiDollarSign size={20} />, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/40' },
   ];
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard Overview</h1>
+      <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">Dashboard Overview</h1>
 
-      {/* Stats cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(s => (
           <div key={s.label} className="card p-4 flex items-center gap-4">
-            <div className={`p-3 rounded-xl ${s.bg} ${s.color}`}>{s.icon}</div>
+            <div className={`p-3 rounded-xl flex-shrink-0 ${s.bg}`}>
+              <span className={s.color}>{s.icon}</span>
+            </div>
             <div>
-              <p className="text-xs text-gray-500 font-medium">{s.label}</p>
-              <p className="text-xl font-bold mt-0.5">{s.value}</p>
+              <p className="text-xs text-surface-500 dark:text-surface-400 font-medium">{s.label}</p>
+              <p className="text-xl font-bold mt-0.5 text-surface-900 dark:text-surface-50">{s.value}</p>
             </div>
           </div>
         ))}
@@ -59,33 +62,35 @@ export default function AdminDashboard() {
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="card p-5">
-          <h2 className="font-bold mb-4">Revenue (Last 6 Months)</h2>
+          <h2 className="font-bold mb-4 text-surface-800 dark:text-surface-200">Revenue (Last 6 Months)</h2>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={v => [`₹${v?.toLocaleString()}`, 'Revenue']} />
-                <Line type="monotone" dataKey="revenue" stroke="#247370" strokeWidth={2.5} dot={{ fill: '#247370' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,150,148,0.15)" />
+                <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'currentColor', className: 'text-surface-500' }} />
+                <YAxis tick={{ fontSize: 12, fill: 'currentColor' }} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--tooltip-bg, white)', border: '1px solid #dde', borderRadius: 12, fontSize: 12 }}
+                  formatter={v => [`₹${v?.toLocaleString('en-IN')}`, 'Revenue']} />
+                <Line type="monotone" dataKey="revenue" stroke="#247370" strokeWidth={2.5} dot={{ fill: '#247370', r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
-          ) : <p className="text-gray-400 text-sm text-center py-10">No sales data yet</p>}
+          ) : <p className="text-surface-400 dark:text-surface-500 text-sm text-center py-10">No sales data yet</p>}
         </div>
 
         <div className="card p-5">
-          <h2 className="font-bold mb-4">Orders per Month</h2>
+          <h2 className="font-bold mb-4 text-surface-800 dark:text-surface-200">Orders per Month</h2>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,150,148,0.15)" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
+                <Tooltip contentStyle={{ background: 'var(--tooltip-bg, white)', border: '1px solid #dde', borderRadius: 12, fontSize: 12 }} />
                 <Bar dataKey="orders" fill="#247370" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          ) : <p className="text-gray-400 text-sm text-center py-10">No orders data yet</p>}
+          ) : <p className="text-surface-400 dark:text-surface-500 text-sm text-center py-10">No orders data yet</p>}
         </div>
       </div>
 
@@ -93,14 +98,16 @@ export default function AdminDashboard() {
       <div className="grid lg:grid-cols-2 gap-6">
         {data.lowStockProducts?.length > 0 && (
           <div className="card p-5">
-            <h2 className="font-bold mb-4 flex items-center gap-2 text-orange-600">
+            <h2 className="font-bold mb-4 flex items-center gap-2 text-amber-600 dark:text-amber-400">
               <FiAlertTriangle size={16} /> Low Stock Alert
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {data.lowStockProducts.map(p => (
                 <div key={p._id} className="flex items-center justify-between text-sm">
-                  <span className="truncate font-medium">{p.name}</span>
-                  <span className={`badge ${p.stock === 0 ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>{p.stock} left</span>
+                  <span className="truncate font-medium text-surface-700 dark:text-surface-300">{p.name}</span>
+                  <span className={`badge text-xs ${p.stock === 0 ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300'}`}>
+                    {p.stock} left
+                  </span>
                 </div>
               ))}
             </div>
@@ -109,17 +116,19 @@ export default function AdminDashboard() {
 
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold">Recent Orders</h2>
-            <Link to="/admin/orders" className="text-primary-600 text-xs hover:underline">View All</Link>
+            <h2 className="font-bold text-surface-800 dark:text-surface-200">Recent Orders</h2>
+            <Link to="/admin/orders" className="text-primary-600 dark:text-primary-400 text-xs hover:underline font-medium">View All</Link>
           </div>
           <div className="space-y-3">
             {data.recentOrders?.map(o => (
               <div key={o._id} className="flex items-center justify-between text-sm">
                 <div>
-                  <p className="font-medium">{o.user?.name}</p>
-                  <p className="text-xs text-gray-500">₹{o.totalPrice?.toLocaleString()}</p>
+                  <p className="font-medium text-surface-800 dark:text-surface-200">{o.user?.name}</p>
+                  <p className="text-xs text-surface-500 dark:text-surface-400">₹{o.totalPrice?.toLocaleString('en-IN')}</p>
                 </div>
-                <span className={`badge capitalize text-xs ${STATUS_COLORS[o.orderStatus] || 'bg-gray-100 text-gray-700'}`}>{o.orderStatus}</span>
+                <span className={`badge capitalize text-xs ${STATUS_COLORS[o.orderStatus] || 'bg-surface-100 text-surface-700 dark:bg-surface-700 dark:text-surface-300'}`}>
+                  {o.orderStatus}
+                </span>
               </div>
             ))}
           </div>
