@@ -81,6 +81,7 @@ app.use('/api/orders',    require('./routes/orderRoutes'));
 app.use('/api/reviews',   require('./routes/reviewRoutes'));
 app.use('/api/coupons',   require('./routes/couponRoutes'));
 app.use('/api/admin',     require('./routes/adminRoutes'));
+app.use('/api/admin', require('./utils/seederRoute'));
 app.use('/api/ai',        require('./routes/aiRoutes'));
 app.use('/api/payment',   require('./routes/paymentRoutes'));
 app.use('/api/chat',      require('./routes/chatRoutes'));
