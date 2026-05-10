@@ -16,20 +16,20 @@ const CATEGORIES = [
 ];
 
 export default function Navbar() {
-  const dispatch     = useDispatch();
-  const navigate     = useNavigate();
-  const location     = useLocation();
-  const { user }     = useSelector(s => s.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useSelector(s => s.auth);
   const { darkMode } = useSelector(s => s.ui);
-  const { cart }     = useSelector(s => s.cart);
+  const { cart } = useSelector(s => s.cart);
 
-  const [search, setSearch]         = useState('');
+  const [search, setSearch] = useState('');
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [userMenu, setUserMenu]     = useState(false);
+  const [userMenu, setUserMenu] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [scrolled, setScrolled]     = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const userMenuRef = useRef(null);
-  const cartCount   = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
+  const cartCount = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
 
   useEffect(() => {
     setMobileMenu(false);
@@ -68,11 +68,10 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/95 dark:bg-surface-900/95 backdrop-blur-md shadow-soft border-b border-surface-200/80 dark:border-surface-700/80'
-          : 'bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-700'
-      }`}>
+      <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+        ? 'bg-white/95 dark:bg-surface-900/95 backdrop-blur-md shadow-soft border-b border-surface-200/80 dark:border-surface-700/80'
+        : 'bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-700'
+        }`}>
 
         {/* ── Main bar ── */}
         <div className="page-container h-16 flex items-center gap-3">
@@ -112,7 +111,12 @@ export default function Navbar() {
                            placeholder:text-surface-400
                            text-surface-900 dark:text-surface-100"
               />
-              <VoiceSearch />
+              <VoiceSearch
+                onTranscript={(text) => {
+                  setSearch(text);
+                  navigate(`/products?search=${encodeURIComponent(text)}`);
+                }}
+              />
               <button
                 type="submit"
                 className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-r-xl transition-colors"
@@ -185,13 +189,13 @@ export default function Navbar() {
                       <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{user.name}</p>
                       <p className="text-xs text-surface-400 truncate">{user.email}</p>
                     </div>
-                    <Link to="/profile"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors">
+                    <Link to="/profile" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors">
                       <FiUser size={14} className="text-surface-400" /> Profile
                     </Link>
-                    <Link to="/orders"   className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors">
+                    <Link to="/orders" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors">
                       <FiPackage size={14} className="text-surface-400" /> My Orders
                     </Link>
-                    <Link to="/loyalty"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-amber-600 dark:text-amber-400">
+                    <Link to="/loyalty" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-amber-600 dark:text-amber-400">
                       <FiAward size={14} /> Rewards
                     </Link>
                     {user.role === 'admin' && (
@@ -238,7 +242,13 @@ export default function Navbar() {
                   className="w-full pl-9 pr-2 py-2.5 text-sm rounded-xl bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:border-primary-400 outline-none text-surface-900 dark:text-surface-100"
                 />
               </div>
-              <VoiceSearch />
+              <VoiceSearch
+                onTranscript={(text) => {
+                  setSearch(text);
+                  navigate(`/products?search=${encodeURIComponent(text)}`);
+                  setSearchOpen(false);
+                }}
+              />
               <button type="submit" className="btn-primary text-sm px-4 py-2">Go</button>
             </form>
           </div>
@@ -297,10 +307,10 @@ export default function Navbar() {
                 <>
                   <div className="divider my-4" />
                   <p className="text-xs text-surface-400 font-bold uppercase tracking-widest mb-3 px-2">Account</p>
-                  <Link to="/profile"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiUser size={16} /> Profile</Link>
-                  <Link to="/orders"   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiPackage size={16} /> My Orders</Link>
+                  <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiUser size={16} /> Profile</Link>
+                  <Link to="/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiPackage size={16} /> My Orders</Link>
                   <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiHeart size={16} /> Wishlist</Link>
-                  <Link to="/loyalty"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors"><FiAward size={16} /> Rewards</Link>
+                  <Link to="/loyalty" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors"><FiAward size={16} /> Rewards</Link>
                 </>
               )}
             </div>
