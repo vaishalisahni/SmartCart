@@ -1,186 +1,298 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiShoppingCart, FiHeart, FiUser, FiSearch, FiMoon, FiSun, FiMenu, FiX, FiLogOut, FiPackage, FiSettings, FiAward } from 'react-icons/fi';
+import {
+  FiShoppingCart, FiHeart, FiUser, FiSearch, FiMoon, FiSun,
+  FiMenu, FiX, FiLogOut, FiPackage, FiSettings, FiAward, FiChevronDown,
+} from 'react-icons/fi';
 import { toggleDarkMode } from '../../store/slices/uiSlice';
 import { logoutUser } from '../../store/slices/authSlice';
 import VoiceSearch from '../search/VoiceSearch';
 import toast from 'react-hot-toast';
 
-const CATEGORIES = ['Electronics', 'Clothing', 'Books', 'Home & Kitchen', 'Sports', 'Beauty', 'Furniture', 'Groceries'];
+const CATEGORIES = [
+  'Electronics', 'Clothing', 'Books', 'Home & Kitchen',
+  'Sports', 'Beauty', 'Furniture', 'Groceries', 'Jewellery', 'Toys',
+];
 
 export default function Navbar() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useSelector(s => s.auth);
+  const dispatch   = useDispatch();
+  const navigate   = useNavigate();
+  const location   = useLocation();
+  const { user }   = useSelector(s => s.auth);
   const { darkMode } = useSelector(s => s.ui);
-  const { cart } = useSelector(s => s.cart);
-  const [search, setSearch] = useState('');
+  const { cart }   = useSelector(s => s.cart);
+  const [search, setSearch]         = useState('');
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [userMenu, setUserMenu] = useState(false);
+  const [userMenu, setUserMenu]     = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled]     = useState(false);
   const userMenuRef = useRef(null);
-  const cartCount = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
+  const cartCount   = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
 
-  useEffect(() => { setMobileMenu(false); setUserMenu(false); }, [location]);
+  useEffect(() => { setMobileMenu(false); setUserMenu(false); setSearchOpen(false); }, [location]);
 
   useEffect(() => {
-    const handler = (e) => { if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenu(false); };
+    const handler = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenu(false);
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const handleSearch = e => {
     e.preventDefault();
-    if (search.trim()) { navigate(`/products?search=${encodeURIComponent(search.trim())}`); setSearch(''); setSearchOpen(false); }
+    if (search.trim()) {
+      navigate(`/products?search=${encodeURIComponent(search.trim())}`);
+      setSearch(''); setSearchOpen(false);
+    }
   };
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
-    toast.success('Logged out');
+    toast.success('Logged out successfully');
     navigate('/');
   };
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center gap-2 sm:gap-4">
-          {/* Mobile menu button */}
-          <button className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setMobileMenu(!mobileMenu)}>
+      <header className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-white/95 dark:bg-surface-900/95 backdrop-blur-md shadow-soft border-b border-surface-200/80 dark:border-surface-800/80'
+          : 'bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800'
+      }`}>
+
+        {/* ── Main bar ── */}
+        <div className="page-container h-16 flex items-center gap-3">
+
+          {/* Mobile hamburger */}
+          <button
+            className="sm:hidden btn-ghost p-2"
+            onClick={() => setMobileMenu(!mobileMenu)}
+            aria-label="Menu"
+          >
             {mobileMenu ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5 flex-shrink-0">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <FiShoppingCart className="text-white text-sm sm:text-lg" />
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0 group">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-lifted transition-all">
+              <FiShoppingCart className="text-white" size={15} />
             </div>
-            <span className="text-lg sm:text-xl font-extrabold text-primary-600 hidden xs:block">SmartCart</span>
+            <span className="font-display text-xl font-bold text-primary-700 dark:text-primary-400 hidden xs:block tracking-tight">
+              SmartCart
+            </span>
           </Link>
 
-          {/* Search — desktop */}
+          {/* Search bar — desktop */}
           <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-auto hidden sm:flex">
             <div className="relative w-full flex items-center">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+              <FiSearch className="absolute left-3.5 text-surface-400" size={15} />
               <input
-                value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search products..."
-                className="w-full pl-9 pr-10 py-2 rounded-l-lg bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-primary-400 focus:bg-white dark:focus:bg-gray-700 outline-none text-sm transition"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search products, brands..."
+                className="w-full pl-10 pr-10 py-2.5 rounded-l-xl bg-surface-100 dark:bg-surface-800
+                           border border-surface-200 dark:border-surface-700
+                           focus:border-primary-400 focus:bg-white dark:focus:bg-surface-750
+                           outline-none text-sm transition-all duration-200 placeholder:text-surface-400"
               />
               <VoiceSearch />
-              <button type="submit" className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-r-lg hover:bg-primary-700 transition">Search</button>
+              <button
+                type="submit"
+                className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-r-xl transition-colors"
+              >
+                Search
+              </button>
             </div>
           </form>
 
           {/* Right actions */}
           <div className="flex items-center gap-1 ml-auto">
-            {/* Mobile search toggle */}
-            <button className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setSearchOpen(!searchOpen)}>
+
+            {/* Mobile search */}
+            <button
+              className="sm:hidden btn-ghost p-2"
+              onClick={() => setSearchOpen(!searchOpen)}
+              aria-label="Search"
+            >
               <FiSearch size={18} />
             </button>
 
-            <button onClick={() => dispatch(toggleDarkMode())} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition hidden sm:flex">
-              {darkMode ? <FiSun className="text-yellow-400" size={18} /> : <FiMoon className="text-gray-600" size={18} />}
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => dispatch(toggleDarkMode())}
+              className="btn-ghost p-2 hidden sm:flex"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode
+                ? <FiSun className="text-amber-400" size={18} />
+                : <FiMoon className="text-surface-500" size={18} />
+              }
             </button>
 
+            {/* Wishlist */}
             {user && (
-              <Link to="/wishlist" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition hidden sm:flex">
-                <FiHeart className="text-gray-600 dark:text-gray-300" size={18} />
+              <Link to="/wishlist" className="btn-ghost p-2 hidden sm:flex" aria-label="Wishlist">
+                <FiHeart className="text-surface-500 dark:text-surface-400" size={18} />
               </Link>
             )}
 
-            <Link to="/cart" className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-              <FiShoppingCart className="text-gray-600 dark:text-gray-300" size={18} />
+            {/* Cart */}
+            <Link to="/cart" className="btn-ghost p-2 relative" aria-label="Cart">
+              <FiShoppingCart className="text-surface-600 dark:text-surface-300" size={18} />
               {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-primary-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{cartCount > 9 ? '9+' : cartCount}</span>
+                <span className="absolute -top-0.5 -right-0.5 bg-primary-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold leading-none">
+                  {cartCount > 9 ? '9+' : cartCount}
+                </span>
               )}
             </Link>
 
+            {/* User menu */}
             {user ? (
               <div className="relative" ref={userMenuRef}>
-                <button onClick={() => setUserMenu(!userMenu)} className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                  <div className="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 font-bold text-xs">
+                <button
+                  onClick={() => setUserMenu(!userMenu)}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 transition-all"
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
                     {user.name?.[0]?.toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium hidden md:block max-w-[80px] truncate">{user.name?.split(' ')[0]}</span>
+                  <span className="text-sm font-semibold hidden md:block max-w-[80px] truncate text-surface-700 dark:text-surface-300">
+                    {user.name?.split(' ')[0]}
+                  </span>
+                  <FiChevronDown size={13} className={`text-surface-400 transition-transform hidden md:block ${userMenu ? 'rotate-180' : ''}`} />
                 </button>
+
                 {userMenu && (
-                  <div className="absolute right-0 mt-2 w-48 card py-1 shadow-lg z-50">
-                    <Link to="/profile" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"><FiUser size={14} /> Profile</Link>
-                    <Link to="/orders" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"><FiPackage size={14} /> My Orders</Link>
-                    <Link to="/loyalty" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-yellow-600"><FiAward size={14} /> Rewards</Link>
+                  <div className="absolute right-0 mt-2 w-52 card py-1 shadow-soft z-50 animate-fade-in">
+                    <div className="px-4 py-2.5 border-b border-surface-100 dark:border-surface-800">
+                      <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{user.name}</p>
+                      <p className="text-xs text-surface-400 truncate">{user.email}</p>
+                    </div>
+                    <Link to="/profile"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"><FiUser size={14} className="text-surface-400" /> Profile</Link>
+                    <Link to="/orders"   className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"><FiPackage size={14} className="text-surface-400" /> My Orders</Link>
+                    <Link to="/loyalty"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-amber-600 dark:text-amber-500"><FiAward size={14} /> Rewards</Link>
                     {user.role === 'admin' && (
-                      <Link to="/admin" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-primary-600"><FiSettings size={14} /> Admin Panel</Link>
+                      <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-primary-600 dark:text-primary-400"><FiSettings size={14} /> Admin Panel</Link>
                     )}
                     <div className="flex items-center justify-between px-4 py-2.5 sm:hidden">
-                      <span className="text-sm">Dark mode</span>
-                      <button onClick={() => dispatch(toggleDarkMode())}>{darkMode ? <FiSun className="text-yellow-400" /> : <FiMoon />}</button>
+                      <span className="text-sm text-surface-600">Dark mode</span>
+                      <button onClick={() => dispatch(toggleDarkMode())}>
+                        {darkMode ? <FiSun className="text-amber-400" size={16} /> : <FiMoon size={16} />}
+                      </button>
                     </div>
-                    <hr className="my-1 border-gray-100 dark:border-gray-800" />
-                    <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-gray-50 dark:hover:bg-gray-800 w-full"><FiLogOut size={14} /> Logout</button>
+                    <div className="border-t border-surface-100 dark:border-surface-800 mt-1" />
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 w-full transition-colors"
+                    >
+                      <FiLogOut size={14} /> Logout
+                    </button>
                   </div>
                 )}
               </div>
             ) : (
-              <Link to="/login" className="btn-primary text-xs sm:text-sm py-1.5 px-3">Login</Link>
+              <div className="flex items-center gap-2">
+                <Link to="/login" className="btn-ghost text-sm py-1.5 px-3 hidden sm:flex">Login</Link>
+                <Link to="/login?mode=register" className="btn-primary text-sm py-1.5 px-4">Sign Up</Link>
+              </div>
             )}
           </div>
         </div>
 
         {/* Mobile search bar */}
         {searchOpen && (
-          <div className="sm:hidden px-3 pb-3">
+          <div className="sm:hidden px-4 pb-3 animate-slide-up">
             <form onSubmit={handleSearch} className="flex gap-2">
               <div className="relative flex-1 flex items-center">
-                <FiSearch className="absolute left-3 text-gray-400" size={14} />
-                <input value={search} onChange={e => setSearch(e.target.value)} autoFocus placeholder="Search products..." className="w-full pl-9 pr-2 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-primary-400 outline-none" />
+                <FiSearch className="absolute left-3 text-surface-400" size={14} />
+                <input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  autoFocus
+                  placeholder="Search products..."
+                  className="w-full pl-9 pr-2 py-2.5 text-sm rounded-xl bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:border-primary-400 outline-none"
+                />
               </div>
               <VoiceSearch />
-              <button type="submit" className="btn-primary text-sm px-3 py-2">Go</button>
+              <button type="submit" className="btn-primary text-sm px-4 py-2">Go</button>
             </form>
           </div>
         )}
 
-        {/* Category strip — horizontal scroll */}
-        <nav className="bg-primary-600 text-white text-xs sm:text-sm overflow-x-auto scrollbar-hide">
-          <div className="max-w-7xl mx-auto px-3 sm:px-4 flex gap-4 sm:gap-6 py-2 whitespace-nowrap">
+        {/* ── Category strip ── */}
+        <nav className="bg-primary-700 dark:bg-primary-900 text-white overflow-x-auto scrollbar-hide">
+          <div className="page-container flex gap-5 py-2 whitespace-nowrap text-xs font-semibold tracking-wide">
+            <Link
+              to="/products"
+              className="hover:text-primary-200 transition-colors flex-shrink-0"
+            >
+              All Products
+            </Link>
             {CATEGORIES.map(cat => (
-              <Link key={cat} to={`/products?search=${cat}`} className="hover:text-primary-200 transition font-medium flex-shrink-0">{cat}</Link>
+              <Link
+                key={cat}
+                to={`/products?search=${encodeURIComponent(cat)}`}
+                className="hover:text-primary-200 transition-colors flex-shrink-0"
+              >
+                {cat}
+              </Link>
             ))}
           </div>
         </nav>
       </header>
 
-      {/* Mobile slide-out menu */}
+      {/* ── Mobile slide-out menu ── */}
       {mobileMenu && (
         <div className="fixed inset-0 z-40 sm:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileMenu(false)} />
-          <div className="absolute left-0 top-0 h-full w-72 bg-white dark:bg-gray-900 shadow-xl flex flex-col">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center"><FiShoppingCart className="text-white" /></div>
-              <span className="font-extrabold text-primary-600">SmartCart</span>
-              <button className="ml-auto" onClick={() => setMobileMenu(false)}><FiX size={20} /></button>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenu(false)} />
+          <div className="absolute left-0 top-0 h-full w-72 bg-white dark:bg-surface-900 shadow-xl flex flex-col animate-slide-in">
+            <div className="p-4 border-b border-surface-200 dark:border-surface-700 flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+                <FiShoppingCart className="text-white" size={15} />
+              </div>
+              <span className="font-display font-bold text-primary-700 dark:text-primary-400">SmartCart</span>
+              <button className="ml-auto btn-ghost p-1.5" onClick={() => setMobileMenu(false)}>
+                <FiX size={18} />
+              </button>
             </div>
+
             <div className="flex-1 overflow-y-auto p-4 space-y-1">
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">Categories</p>
+              <p className="text-xs text-surface-400 font-bold uppercase tracking-widest mb-3 px-2">Categories</p>
               {CATEGORIES.map(cat => (
-                <Link key={cat} to={`/products?search=${cat}`} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm transition">{cat}</Link>
+                <Link
+                  key={cat}
+                  to={`/products?search=${encodeURIComponent(cat)}`}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"
+                >
+                  {cat}
+                </Link>
               ))}
+
               {user && (
                 <>
-                  <hr className="my-3 border-gray-200 dark:border-gray-700" />
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">Account</p>
-                  <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"><FiUser size={16} /> Profile</Link>
-                  <Link to="/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"><FiPackage size={16} /> My Orders</Link>
-                  <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"><FiHeart size={16} /> Wishlist</Link>
-                  <Link to="/loyalty" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-yellow-600"><FiAward size={16} /> Rewards</Link>
+                  <div className="divider my-4" />
+                  <p className="text-xs text-surface-400 font-bold uppercase tracking-widest mb-3 px-2">Account</p>
+                  <Link to="/profile"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"><FiUser size={16} /> Profile</Link>
+                  <Link to="/orders"   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"><FiPackage size={16} /> My Orders</Link>
+                  <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"><FiHeart size={16} /> Wishlist</Link>
+                  <Link to="/loyalty"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-amber-600 transition-colors"><FiAward size={16} /> Rewards</Link>
                 </>
               )}
             </div>
+
             {user && (
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-red-500 w-full px-3 py-2"><FiLogOut size={16} /> Logout</button>
+              <div className="p-4 border-t border-surface-200 dark:border-surface-700">
+                <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-red-500 w-full px-3 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors font-medium">
+                  <FiLogOut size={16} /> Logout
+                </button>
               </div>
             )}
           </div>

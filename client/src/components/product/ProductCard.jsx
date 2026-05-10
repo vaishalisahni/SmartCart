@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();
-  const { user } = useSelector(s => s.auth);
+  const { user }     = useSelector(s => s.auth);
   const { wishlist } = useSelector(s => s.wishlist);
   const isWishlisted = wishlist?.products?.some(p => (p._id || p) === product._id);
 
@@ -22,57 +22,99 @@ export default function ProductCard({ product }) {
 
   const handleWishlist = async e => {
     e.preventDefault();
-    if (!user) { toast.error('Please login'); return; }
+    if (!user) { toast.error('Please login first'); return; }
     await dispatch(toggleWishlist(product._id));
     toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
   return (
-    <Link to={`/products/${product._id}`} className="card group hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
+    <Link
+      to={`/products/${product._id}`}
+      className="card-hover group flex flex-col overflow-hidden transition-all duration-300"
+    >
       {/* Image */}
-      <div className="relative overflow-hidden bg-gray-50 dark:bg-gray-800 aspect-square">
+      <div className="relative overflow-hidden bg-surface-100 dark:bg-surface-800 aspect-square">
         <img
           src={product.images?.[0] || 'https://via.placeholder.com/300'}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+          loading="lazy"
         />
-        {product.discountPercent > 0 && (
-          <span className="absolute top-2 left-2 badge bg-red-500 text-white">{product.discountPercent}% OFF</span>
-        )}
+
+        {/* Badges */}
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
+          {product.discountPercent > 0 && (
+            <span className="badge bg-red-500 text-white shadow-sm">
+              -{product.discountPercent}%
+            </span>
+          )}
+          {product.isFeatured && !product.discountPercent && (
+            <span className="badge bg-primary-600 text-white shadow-sm">Featured</span>
+          )}
+        </div>
+
         {product.stock === 0 && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">Out of Stock</span>
+          <div className="absolute inset-0 bg-black/55 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="text-white font-bold text-sm bg-black/40 px-3 py-1 rounded-full">Out of Stock</span>
           </div>
         )}
+
         {product.stock > 0 && product.stock < 10 && (
-          <span className="absolute top-2 right-2 badge bg-orange-500 text-white">Only {product.stock} left</span>
+          <span className="absolute top-2.5 right-10 badge bg-amber-500 text-white shadow-sm">
+            {product.stock} left
+          </span>
         )}
-        <button onClick={handleWishlist}
-          className={`absolute top-2 right-2 p-1.5 rounded-full shadow transition ${isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:text-red-500'}`}>
-          <FiHeart size={14} fill={isWishlisted ? 'currentColor' : 'none'} />
+
+        {/* Wishlist button */}
+        <button
+          onClick={handleWishlist}
+          className={`absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all duration-200 active:scale-90 ${
+            isWishlisted
+              ? 'bg-red-500 text-white'
+              : 'bg-white/90 dark:bg-surface-800/90 text-surface-500 hover:text-red-500 hover:bg-white'
+          }`}
+          aria-label="Toggle wishlist"
+        >
+          <FiHeart size={13} fill={isWishlisted ? 'currentColor' : 'none'} />
         </button>
       </div>
 
       {/* Info */}
-      <div className="p-3 flex flex-col gap-1 flex-1">
-        {product.brand && <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">{product.brand}</p>}
-        <h3 className="text-sm font-semibold line-clamp-2 text-gray-900 dark:text-gray-100 group-hover:text-primary-600 transition">{product.name}</h3>
+      <div className="p-3.5 flex flex-col gap-1.5 flex-1">
+        {product.brand && (
+          <p className="text-[10px] text-primary-600 dark:text-primary-400 font-bold uppercase tracking-widest">
+            {product.brand}
+          </p>
+        )}
+        <h3 className="text-sm font-semibold line-clamp-2 text-surface-800 dark:text-surface-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors leading-snug">
+          {product.name}
+        </h3>
 
         <div className="flex items-center gap-1 mt-0.5">
-          <FiStar size={12} className="text-yellow-400 fill-yellow-400" />
-          <span className="text-xs text-gray-600 dark:text-gray-400">{product.ratings?.toFixed(1)} ({product.numReviews})</span>
+          <FiStar size={11} className="text-amber-400 fill-amber-400" />
+          <span className="text-[11px] text-surface-500 dark:text-surface-400 font-medium">
+            {product.ratings?.toFixed(1)} <span className="text-surface-400">({product.numReviews})</span>
+          </span>
         </div>
 
-        <div className="flex items-center gap-2 mt-auto pt-2">
-          <span className="text-base font-bold text-gray-900 dark:text-white">₹{product.price?.toLocaleString()}</span>
+        <div className="flex items-baseline gap-2 mt-auto pt-2">
+          <span className="text-base font-bold text-surface-900 dark:text-white">
+            ₹{product.price?.toLocaleString('en-IN')}
+          </span>
           {product.originalPrice > product.price && (
-            <span className="text-xs text-gray-400 line-through">₹{product.originalPrice?.toLocaleString()}</span>
+            <span className="text-xs text-surface-400 line-through">
+              ₹{product.originalPrice?.toLocaleString('en-IN')}
+            </span>
           )}
         </div>
 
-        <button onClick={handleAddToCart} disabled={product.stock === 0}
-          className="mt-2 w-full btn-primary text-xs py-2 flex items-center justify-center gap-1.5 disabled:opacity-40">
-          <FiShoppingCart size={13} /> Add to Cart
+        <button
+          onClick={handleAddToCart}
+          disabled={product.stock === 0}
+          className="mt-2 w-full btn-primary text-xs py-2 gap-1.5 disabled:opacity-40"
+        >
+          <FiShoppingCart size={12} />
+          Add to Cart
         </button>
       </div>
     </Link>
