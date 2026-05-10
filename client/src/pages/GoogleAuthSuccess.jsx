@@ -12,21 +12,30 @@ export default function GoogleAuthSuccess() {
   useEffect(() => {
     const token = params.get('token');
     const error = params.get('error');
-    if (error) { toast.error('Google login failed'); navigate('/login'); return; }
+    if (error) {
+      toast.error('Google login failed. Please try again.');
+      navigate('/login');
+      return;
+    }
     if (token) {
       localStorage.setItem('accessToken', token);
       dispatch(loadUser()).then(() => {
-        toast.success('Logged in with Google! 🎉');
+        toast.success('Signed in with Google! 🎉');
         navigate('/');
       });
     }
   }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-500">Signing you in with Google...</p>
+    <div className="flex items-center justify-center min-h-screen bg-surface-50 dark:bg-surface-950">
+      <div className="text-center space-y-4">
+        <div className="w-16 h-16 bg-primary-50 dark:bg-primary-900/40 rounded-2xl flex items-center justify-center mx-auto">
+          <div className="w-8 h-8 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+        </div>
+        <div>
+          <p className="font-semibold text-surface-700 dark:text-surface-300">Signing you in with Google...</p>
+          <p className="text-sm text-surface-400 dark:text-surface-500 mt-1">Please wait a moment</p>
+        </div>
       </div>
     </div>
   );

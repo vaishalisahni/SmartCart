@@ -5,9 +5,8 @@ import { FiMessageCircle, FiX, FiSend, FiMinus, FiUser, FiCpu } from 'react-icon
 import toast from 'react-hot-toast';
 
 const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
-const API_BASE   = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
-// ── Typing dots indicator ─────────────────────────────────────
 function TypingDots() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px' }}>
@@ -15,16 +14,15 @@ function TypingDots() {
         <div key={i} style={{
           width: '6px', height: '6px', borderRadius: '50%',
           background: '#6b7280',
-          animation: 'bounce 1.2s ease-in-out infinite',
+          animation: 'chatBounce 1.2s ease-in-out infinite',
           animationDelay: `${d}s`,
         }} />
       ))}
-      <style>{`@keyframes bounce{0%,80%,100%{transform:scale(0.6)}40%{transform:scale(1)}}`}</style>
+      <style>{`@keyframes chatBounce{0%,80%,100%{transform:scale(0.6)}40%{transform:scale(1)}}`}</style>
     </div>
   );
 }
 
-// ── AI Bot reply via your backend ─────────────────────────────
 async function getAIReply(userMessage, history) {
   try {
     const token = localStorage.getItem('accessToken');
@@ -44,7 +42,6 @@ async function getAIReply(userMessage, history) {
   }
 }
 
-// ── Quick reply buttons ───────────────────────────────────────
 const QUICK_REPLIES = [
   'Track my order',
   'Return policy',
@@ -54,19 +51,18 @@ const QUICK_REPLIES = [
 
 export default function LiveChat() {
   const { user } = useSelector(s => s.auth);
-  const [open, setOpen]           = useState(false);
+  const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
-  const [messages, setMessages]   = useState([]);
-  const [text, setText]           = useState('');
-  const [aiTyping, setAiTyping]   = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState('');
+  const [aiTyping, setAiTyping] = useState(false);
   const [humanTyping, setHumanTyping] = useState(false);
-  const [mode, setMode]           = useState('bot'); // 'bot' | 'human'
-  const [unread, setUnread]       = useState(0);
+  const [mode, setMode] = useState('bot');
+  const [unread, setUnread] = useState(0);
   const socketRef = useRef(null);
   const bottomRef = useRef(null);
-  const roomId    = user ? `user_${user._id}` : null;
+  const roomId = user ? `user_${user._id}` : null;
 
-  // Welcome message on first open
   useEffect(() => {
     if (open && messages.length === 0) {
       setMessages([{
@@ -79,7 +75,6 @@ export default function LiveChat() {
     }
   }, [open]);
 
-  // Socket for human agent mode
   useEffect(() => {
     if (!open || !user || mode !== 'human') return;
     const socket = io(SOCKET_URL);
@@ -124,7 +119,6 @@ export default function LiveChat() {
     setText('');
 
     if (mode === 'bot') {
-      // Check if user wants human agent
       const wantsHuman = /human|agent|person|representative|support team/i.test(msg);
       if (wantsHuman) {
         setAiTyping(true);
@@ -139,7 +133,6 @@ export default function LiveChat() {
         return;
       }
 
-      // AI reply
       setAiTyping(true);
       const history = messages.slice(-6).map(m => ({
         role: m.isBot || m.isAdmin ? 'assistant' : 'user',
@@ -153,7 +146,6 @@ export default function LiveChat() {
         isBot: true, isAdmin: false, time: new Date(),
       }]);
     } else {
-      // Human agent mode — send via socket
       if (socketRef.current) {
         socketRef.current.emit('message:send', {
           roomId, senderId: user._id, senderName: user.name, text: msg, isAdmin: false,
@@ -164,81 +156,104 @@ export default function LiveChat() {
 
   if (!user) return null;
 
+  const primaryColor = '#247370';
+  const agentColor = '#6366f1';
+
   return (
     <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
       {open && !minimized && (
         <div style={{
-          width: '340px', height: '480px',
-          background: 'white', borderRadius: '16px',
+          width: '340px',
+          height: '480px',
+          background: 'white',
+          borderRadius: '20px',
           boxShadow: '0 20px 60px rgba(0,0,0,.15)',
-          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
           border: '1px solid rgba(0,0,0,.08)',
         }}>
           {/* Header */}
           <div style={{
-            background: '#247370', color: 'white',
-            padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            background: `linear-gradient(135deg, ${primaryColor}, #1e5c5a)`,
+            color: 'white',
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{
-                width: '36px', height: '36px', borderRadius: '50%',
+                width: '38px', height: '38px', borderRadius: '50%',
                 background: 'rgba(255,255,255,.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '2px solid rgba(255,255,255,.3)',
               }}>
-                {mode === 'bot' ? <FiCpu size={18} /> : <FiUser size={18} />}
+                {mode === 'bot' ? <FiCpu size={17} /> : <FiUser size={17} />}
               </div>
               <div>
-                <p style={{ fontWeight: 600, fontSize: '14px', margin: 0 }}>
+                <p style={{ fontWeight: 700, fontSize: '14px', margin: 0, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                   {mode === 'bot' ? 'SmartCart AI' : 'Support Agent'}
                 </p>
-                <p style={{ fontSize: '11px', opacity: .8, margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <p style={{ fontSize: '11px', opacity: .85, margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
-                  {mode === 'bot' ? 'AI Assistant' : 'Live Support'}
+                  {mode === 'bot' ? 'AI Assistant · Online' : 'Live Support'}
                 </p>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               {mode === 'human' && (
                 <button
                   onClick={() => setMode('bot')}
                   title="Switch to AI"
-                  style={{ background: 'rgba(255,255,255,.2)', border: 'none', color: 'white', borderRadius: '6px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}
+                  style={{
+                    background: 'rgba(255,255,255,.2)', border: '1px solid rgba(255,255,255,.3)',
+                    color: 'white', borderRadius: '8px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: '3px',
+                  }}
                 >
-                  <FiCpu size={12} style={{ verticalAlign: 'middle', marginRight: '3px' }} />AI
+                  <FiCpu size={11} />AI
                 </button>
               )}
-              <button onClick={() => setMinimized(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', padding: '2px' }}>
-                <FiMinus size={14} />
+              <button
+                onClick={() => setMinimized(true)}
+                style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: 'white', borderRadius: '8px', padding: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              >
+                <FiMinus size={13} />
               </button>
-              <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', padding: '2px' }}>
-                <FiX size={14} />
+              <button
+                onClick={() => setOpen(false)}
+                style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: 'white', borderRadius: '8px', padding: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              >
+                <FiX size={13} />
               </button>
             </div>
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#f9fafb' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafa' }}>
             {messages.map((m) => (
               <div key={m.id} style={{ display: 'flex', justifyContent: m.isBot || m.isAdmin ? 'flex-start' : 'flex-end' }}>
                 {(m.isBot || m.isAdmin) && (
                   <div style={{
-                    width: '24px', height: '24px', borderRadius: '50%',
-                    background: m.isBot ? '#247370' : '#6366f1',
+                    width: '26px', height: '26px', borderRadius: '50%',
+                    background: m.isBot ? primaryColor : agentColor,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginRight: '6px', flexShrink: 0, alignSelf: 'flex-end',
+                    marginRight: '6px', flexShrink: 0, alignSelf: 'flex-end', marginBottom: '2px',
                   }}>
-                    {m.isBot ? <FiCpu size={12} color="white" /> : <FiUser size={12} color="white" />}
+                    {m.isBot ? <FiCpu size={11} color="white" /> : <FiUser size={11} color="white" />}
                   </div>
                 )}
                 <div style={{
                   maxWidth: '72%',
-                  padding: '8px 12px',
+                  padding: '9px 13px',
                   borderRadius: m.isBot || m.isAdmin ? '16px 16px 16px 4px' : '16px 16px 4px 16px',
-                  background: m.isBot || m.isAdmin ? 'white' : '#247370',
-                  color: m.isBot || m.isAdmin ? '#111827' : 'white',
+                  background: m.isBot || m.isAdmin ? 'white' : primaryColor,
+                  color: m.isBot || m.isAdmin ? '#0a1f1e' : 'white',
                   fontSize: '13px',
-                  lineHeight: 1.5,
-                  boxShadow: '0 1px 3px rgba(0,0,0,.08)',
+                  lineHeight: 1.55,
+                  boxShadow: '0 1px 4px rgba(0,0,0,.08)',
+                  border: m.isBot || m.isAdmin ? '1px solid rgba(0,0,0,.06)' : 'none',
                 }}>
                   {m.text}
                   <div style={{ fontSize: '10px', opacity: .5, marginTop: '3px', textAlign: 'right' }}>
@@ -251,13 +266,13 @@ export default function LiveChat() {
             {(aiTyping || humanTyping) && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{
-                  width: '24px', height: '24px', borderRadius: '50%',
-                  background: aiTyping ? '#247370' : '#6366f1',
+                  width: '26px', height: '26px', borderRadius: '50%',
+                  background: aiTyping ? primaryColor : agentColor,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  {aiTyping ? <FiCpu size={12} color="white" /> : <FiUser size={12} color="white" />}
+                  {aiTyping ? <FiCpu size={11} color="white" /> : <FiUser size={11} color="white" />}
                 </div>
-                <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,.08)' }}>
+                <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,.08)', border: '1px solid rgba(0,0,0,.06)' }}>
                   <TypingDots />
                 </div>
               </div>
@@ -265,17 +280,19 @@ export default function LiveChat() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Quick replies — only in bot mode and if no messages yet beyond welcome */}
+          {/* Quick replies */}
           {mode === 'bot' && messages.length <= 1 && (
-            <div style={{ padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: '6px', borderTop: '1px solid #f0f0f0', background: 'white' }}>
+            <div style={{ padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: '6px', borderTop: '1px solid #e8efef', background: 'white' }}>
               {QUICK_REPLIES.map(qr => (
                 <button
                   key={qr}
                   onClick={() => sendMessage(qr)}
                   style={{
-                    fontSize: '11px', padding: '4px 10px', borderRadius: '999px',
-                    border: '1px solid #d1fae5', background: '#f0fdf4', color: '#065f46',
-                    cursor: 'pointer',
+                    fontSize: '11px', padding: '5px 11px', borderRadius: '999px',
+                    border: `1px solid #aeddda`,
+                    background: '#eef7f6', color: '#1e5c5a',
+                    cursor: 'pointer', fontWeight: 600,
+                    transition: 'all .15s',
                   }}
                 >
                   {qr}
@@ -285,16 +302,17 @@ export default function LiveChat() {
           )}
 
           {/* Input */}
-          <div style={{ padding: '10px 12px', borderTop: '1px solid #f0f0f0', display: 'flex', gap: '8px', background: 'white' }}>
+          <div style={{ padding: '10px 12px', borderTop: '1px solid #e8efef', display: 'flex', gap: '8px', background: 'white' }}>
             <input
               value={text}
               onChange={e => handleTyping(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
               placeholder={mode === 'bot' ? 'Ask anything…' : 'Message support…'}
               style={{
-                flex: 1, padding: '8px 12px', borderRadius: '20px',
-                border: '1px solid #e5e7eb', outline: 'none',
-                fontSize: '13px', background: '#f9fafb',
+                flex: 1, padding: '8px 13px', borderRadius: '20px',
+                border: '1.5px solid #ddeaea', outline: 'none',
+                fontSize: '13px', background: '#f8fafa',
+                color: '#0a1f1e', fontFamily: 'Plus Jakarta Sans, sans-serif',
               }}
             />
             <button
@@ -302,10 +320,12 @@ export default function LiveChat() {
               disabled={!text.trim() || aiTyping}
               style={{
                 width: '36px', height: '36px', borderRadius: '50%',
-                background: text.trim() && !aiTyping ? '#247370' : '#e5e7eb',
-                border: 'none', cursor: text.trim() && !aiTyping ? 'pointer' : 'not-allowed',
+                background: text.trim() && !aiTyping ? primaryColor : '#e5e7eb',
+                border: 'none',
+                cursor: text.trim() && !aiTyping ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background .2s',
+                flexShrink: 0,
               }}
             >
               <FiSend size={14} color="white" />
@@ -314,36 +334,83 @@ export default function LiveChat() {
         </div>
       )}
 
+      {/* Minimized bar */}
+      {open && minimized && (
+        <button
+          onClick={() => setMinimized(false)}
+          style={{
+            background: primaryColor,
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '10px 16px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '13px',
+            fontWeight: 600,
+            boxShadow: '0 8px 24px rgba(36,115,112,.4)',
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+          }}
+        >
+          <FiMessageCircle size={16} />
+          SmartCart Support
+        </button>
+      )}
+
       {/* FAB button */}
-      <button
-        onClick={() => { setOpen(!open); setMinimized(false); setUnread(0); }}
-        style={{
-          width: '56px', height: '56px',
-          background: '#247370',
-          border: 'none', borderRadius: '50%',
-          cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 8px 24px rgba(36,115,112,.4)',
-          transition: 'transform .2s',
-          position: 'relative',
-        }}
-        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-        aria-label={open ? 'Close chat' : 'Open chat'}
-      >
-        {open ? <FiX size={22} color="white" /> : <FiMessageCircle size={22} color="white" />}
-        {unread > 0 && !open && (
-          <span style={{
-            position: 'absolute', top: '-2px', right: '-2px',
-            background: '#ef4444', color: 'white',
-            fontSize: '11px', fontWeight: 600,
-            width: '18px', height: '18px', borderRadius: '50%',
+      {!open && (
+        <button
+          onClick={() => { setOpen(true); setMinimized(false); setUnread(0); }}
+          style={{
+            width: '56px', height: '56px',
+            background: primaryColor,
+            border: 'none', borderRadius: '50%',
+            cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            {unread > 9 ? '9+' : unread}
-          </span>
-        )}
-      </button>
+            boxShadow: '0 8px 24px rgba(36,115,112,.4)',
+            transition: 'transform .2s',
+            position: 'relative',
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          aria-label="Open chat"
+        >
+          <FiMessageCircle size={22} color="white" />
+          {unread > 0 && (
+            <span style={{
+              position: 'absolute', top: '-2px', right: '-2px',
+              background: '#ef4444', color: 'white',
+              fontSize: '11px', fontWeight: 700,
+              width: '18px', height: '18px', borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {unread > 9 ? '9+' : unread}
+            </span>
+          )}
+        </button>
+      )}
+
+      {open && !minimized && (
+        <button
+          onClick={() => setOpen(false)}
+          style={{
+            width: '56px', height: '56px',
+            background: primaryColor,
+            border: 'none', borderRadius: '50%',
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 8px 24px rgba(36,115,112,.4)',
+            transition: 'transform .2s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          aria-label="Close chat"
+        >
+          <FiX size={22} color="white" />
+        </button>
+      )}
     </div>
   );
 }

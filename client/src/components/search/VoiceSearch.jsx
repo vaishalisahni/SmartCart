@@ -4,7 +4,7 @@ import { FiMic, FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 
-// ── Waveform bars ─────────────────────────────────────────────────────────────
+// ── Waveform bars ─────────────────────────────────────────────
 function WaveBars({ active, darkMode }) {
   const [h, setH] = useState([5, 12, 8, 18, 6, 22, 9, 15, 5, 19]);
   const timerRef = useRef(null);
@@ -21,7 +21,8 @@ function WaveBars({ active, darkMode }) {
     return () => clearInterval(timerRef.current);
   }, [active]);
 
-  const COLORS = ['#4285f4', '#ea4335', '#fbbc05', '#34a853'];
+  // Teal-themed colors
+  const COLORS = ['#247370', '#2e8f8a', '#4aaaa5', '#7cc7c3'];
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 32 }}>
@@ -30,7 +31,7 @@ function WaveBars({ active, darkMode }) {
           width: 4,
           height: active ? height : 3,
           borderRadius: 2,
-          background: active ? COLORS[i % 4] : (darkMode ? '#4b5563' : '#d1d5db'),
+          background: active ? COLORS[i % 4] : (darkMode ? '#2a5250' : '#bdd4d3'),
           transition: active ? 'height 0.08s ease' : 'height 0.4s ease, background 0.3s',
         }} />
       ))}
@@ -43,16 +44,16 @@ function VoiceModal({ state, transcript, onClose, darkMode }) {
   const isListening = state === 'listening';
   const isDone = state === 'done';
 
-  const bg          = darkMode ? '#1c3836' : '#ffffff';
-  const handleColor = darkMode ? '#4b5563' : '#e5e7eb';
-  const closeBg     = darkMode ? '#2a5250' : '#f3f4f6';
-  const closeColor  = darkMode ? '#9ca3af' : '#6b7280';
-  const textPrimary = darkMode ? '#f1f5f9' : '#111827';
-  const textMuted   = darkMode ? '#9ca3af' : '#6b7280';
-  const dotColor    = darkMode ? '#4b5563' : '#d1d5db';
-  const scrim       = darkMode ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.52)';
-  const micBg       = isListening ? '#ef4444' : isDone ? '#247370' : (darkMode ? '#2a5250' : '#f3f4f6');
-  const micIconColor = (isListening || isDone) ? '#fff' : (darkMode ? '#6b7280' : '#9ca3af');
+  const bg = darkMode ? '#122828' : '#ffffff';
+  const handleColor = darkMode ? '#2a5250' : '#ddeaea';
+  const closeBg = darkMode ? '#1c3836' : '#eef7f6';
+  const closeColor = darkMode ? '#5f9290' : '#3d706e';
+  const textPrimary = darkMode ? '#f1f5f9' : '#0a1f1e';
+  const textMuted = darkMode ? '#5f9290' : '#5f9290';
+  const dotColor = darkMode ? '#2a5250' : '#bdd4d3';
+  const scrim = darkMode ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.45)';
+  const micBg = isListening ? '#ef4444' : isDone ? '#247370' : (darkMode ? '#1c3836' : '#eef7f6');
+  const micIconColor = (isListening || isDone) ? '#fff' : (darkMode ? '#5f9290' : '#8fb5b3');
 
   return createPortal(
     <>
@@ -63,7 +64,6 @@ function VoiceModal({ state, transcript, onClose, darkMode }) {
         @keyframes vsDot{0%,80%,100%{transform:scale(.5);opacity:.25}40%{transform:scale(1);opacity:1}}
       `}</style>
 
-      {/* Scrim — clicking it cancels */}
       <div
         onClick={onClose}
         style={{
@@ -73,7 +73,6 @@ function VoiceModal({ state, transcript, onClose, darkMode }) {
         }}
       />
 
-      {/* Sheet */}
       <div
         onClick={e => e.stopPropagation()}
         style={{
@@ -81,12 +80,13 @@ function VoiceModal({ state, transcript, onClose, darkMode }) {
           transform: 'translateX(-50%)',
           width: '100%', maxWidth: 500,
           background: bg,
-          borderRadius: '20px 20px 0 0',
+          borderRadius: '24px 24px 0 0',
           padding: '18px 28px 52px',
           zIndex: 9999,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           animation: 'vsSheet .22s cubic-bezier(.32,.72,0,1)',
-          boxShadow: '0 -4px 24px rgba(0,0,0,0.15)',
+          boxShadow: '0 -4px 32px rgba(0,0,0,0.2)',
+          borderTop: `1px solid ${darkMode ? '#1c3836' : '#ddeaea'}`,
         }}
       >
         {/* Handle */}
@@ -116,7 +116,7 @@ function VoiceModal({ state, transcript, onClose, darkMode }) {
               top: '-50%', left: '-50%',
               width: '200%', height: '200%',
               borderRadius: '50%',
-              background: 'rgba(239,68,68,0.2)',
+              background: 'rgba(239,68,68,0.15)',
               animation: 'vsPing 1.4s ease-out infinite',
             }} />
           )}
@@ -126,7 +126,11 @@ function VoiceModal({ state, transcript, onClose, darkMode }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'background 0.25s ease',
             position: 'relative', zIndex: 1,
-            boxShadow: isListening ? '0 0 0 8px rgba(239,68,68,0.1)' : 'none',
+            boxShadow: isListening
+              ? '0 0 0 8px rgba(239,68,68,0.1)'
+              : isDone
+              ? '0 0 0 8px rgba(36,115,112,0.15)'
+              : 'none',
           }}>
             <FiMic size={28} color={micIconColor} />
           </div>
@@ -180,13 +184,13 @@ function VoiceModal({ state, transcript, onClose, darkMode }) {
   );
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
+// ── Main export ───────────────────────────────────────────────
 export default function VoiceSearch({ onTranscript }) {
   const { darkMode } = useSelector(s => s.ui);
-  const [state, setState]             = useState('idle'); // idle | listening | done
-  const [transcript, setTranscript]   = useState('');
-  const recRef      = useRef(null);
-  const finalRef    = useRef('');
+  const [state, setState] = useState('idle');
+  const [transcript, setTranscript] = useState('');
+  const recRef = useRef(null);
+  const finalRef = useRef('');
   const autoStopRef = useRef(null);
 
   const cleanup = useCallback(() => {
@@ -204,9 +208,7 @@ export default function VoiceSearch({ onTranscript }) {
     finalRef.current = '';
   }, [cleanup]);
 
-  // ── Start voice recognition ───────────────────────────────────────────────
   const start = useCallback(async (e) => {
-    // CRITICAL: prevent the button from submitting the parent <form>
     if (e) { e.preventDefault(); e.stopPropagation(); }
 
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -215,11 +217,9 @@ export default function VoiceSearch({ onTranscript }) {
       return;
     }
 
-    // Explicitly request mic permission — this is why the old code silently failed.
-    // SpeechRecognition won't work if the user hasn't granted mic access via getUserMedia first.
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(t => t.stop()); // release immediately, just needed the grant
+      stream.getTracks().forEach(t => t.stop());
     } catch (err) {
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
         toast.error('Mic blocked. Click the 🔒 in the address bar → allow Microphone.', { duration: 6000 });
@@ -235,9 +235,9 @@ export default function VoiceSearch({ onTranscript }) {
     setState('listening');
 
     const rec = new SR();
-    rec.lang            = 'en-IN';
-    rec.interimResults  = true;   // show words as you speak
-    rec.continuous      = true;   // don't stop at first pause
+    rec.lang = 'en-IN';
+    rec.interimResults = true;
+    rec.continuous = true;
     rec.maxAlternatives = 1;
     recRef.current = rec;
 
@@ -256,8 +256,8 @@ export default function VoiceSearch({ onTranscript }) {
     };
 
     rec.onerror = (event) => {
-      if (event.error === 'aborted') return;   // we triggered this — ignore
-      if (event.error === 'no-speech') { close(); return; } // silence — close quietly
+      if (event.error === 'aborted') return;
+      if (event.error === 'no-speech') { close(); return; }
       if (event.error === 'not-allowed') {
         toast.error('Mic access denied. Allow microphone in browser settings.', { duration: 5000 });
       } else if (event.error === 'network') {
@@ -271,7 +271,6 @@ export default function VoiceSearch({ onTranscript }) {
     rec.onend = () => {
       clearTimeout(autoStopRef.current);
       const result = finalRef.current.trim();
-      // Prefer confirmed final; fall back to whatever was shown as interim
       const best = result || transcript.trim();
       if (best) {
         setState('done');
@@ -293,7 +292,6 @@ export default function VoiceSearch({ onTranscript }) {
       return;
     }
 
-    // Auto-stop after 10 s so it doesn't run forever
     autoStopRef.current = setTimeout(() => {
       if (recRef.current) {
         try { recRef.current.stop(); } catch (_) {}
@@ -302,7 +300,7 @@ export default function VoiceSearch({ onTranscript }) {
   }, [cleanup, close, onTranscript, transcript]);
 
   const handleMicClick = useCallback((e) => {
-    e.preventDefault();   // stop form submission
+    e.preventDefault();
     e.stopPropagation();
     if (state !== 'idle') {
       close();
@@ -317,11 +315,6 @@ export default function VoiceSearch({ onTranscript }) {
 
   return (
     <>
-      {/*
-        type="button" is MANDATORY here.
-        Without it the browser defaults to type="submit" and clicking
-        the mic inside a <form> submits the form before recognition starts.
-      */}
       <button
         type="button"
         onClick={handleMicClick}
@@ -331,7 +324,7 @@ export default function VoiceSearch({ onTranscript }) {
           transition-colors duration-150 flex-shrink-0 cursor-pointer
           ${isActive
             ? 'text-red-500 bg-red-50 dark:bg-red-950/30 dark:text-red-400'
-            : 'text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700'
+            : 'text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30'
           }
         `}
         style={{ border: 'none', outline: 'none' }}
@@ -340,7 +333,7 @@ export default function VoiceSearch({ onTranscript }) {
         {state === 'listening' && (
           <span style={{
             position: 'absolute', inset: 0, borderRadius: 8,
-            background: 'rgba(239,68,68,0.18)',
+            background: 'rgba(239,68,68,0.15)',
             animation: 'vsPing 1.4s ease-out infinite',
           }} />
         )}

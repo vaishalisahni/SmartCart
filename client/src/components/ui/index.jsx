@@ -9,7 +9,7 @@ export function StarRating({ rating, size = 16, onChange }) {
           key={n}
           onClick={() => onChange?.(n)}
           type="button"
-          className={onChange ? 'cursor-pointer' : 'cursor-default'}
+          className={onChange ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}
         >
           <FiStar
             size={size}
@@ -23,9 +23,13 @@ export function StarRating({ rating, size = 16, onChange }) {
 
 // ── Spinner ───────────────────────────────────────────────────
 export function Spinner({ size = 'md' }) {
-  const s = size === 'sm' ? 'w-5 h-5 border-2' : size === 'lg' ? 'w-12 h-12 border-4' : 'w-8 h-8 border-3';
+  const s = size === 'sm'
+    ? 'w-5 h-5 border-2'
+    : size === 'lg'
+    ? 'w-12 h-12 border-4'
+    : 'w-8 h-8 border-[3px]';
   return (
-    <div className={`${s} border-primary-200 border-t-primary-600 rounded-full animate-spin`} />
+    <div className={`${s} border-primary-200 dark:border-primary-800 border-t-primary-600 dark:border-t-primary-400 rounded-full animate-spin`} />
   );
 }
 
@@ -33,7 +37,7 @@ export function PageLoader() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
       <Spinner size="lg" />
-      <p className="text-sm text-surface-400 animate-pulse-soft">Loading...</p>
+      <p className="text-sm text-surface-400 dark:text-surface-500 animate-pulse">Loading...</p>
     </div>
   );
 }
@@ -56,7 +60,7 @@ export function Pagination({ page, pages, onPageChange }) {
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
-        className="btn-outline px-3 py-2 text-sm disabled:opacity-40 gap-1"
+        className="inline-flex items-center gap-1 border-2 border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-950 font-semibold px-3 py-2 rounded-xl text-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <FiChevronLeft size={14} /> Prev
       </button>
@@ -64,7 +68,7 @@ export function Pagination({ page, pages, onPageChange }) {
       {page > 3 && (
         <>
           <PageBtn n={1} current={page} onClick={onPageChange} />
-          {page > 4 && <span className="text-surface-400 px-1">…</span>}
+          {page > 4 && <span className="text-surface-400 dark:text-surface-500 px-1">…</span>}
         </>
       )}
 
@@ -74,7 +78,7 @@ export function Pagination({ page, pages, onPageChange }) {
 
       {page < pages - 2 && (
         <>
-          {page < pages - 3 && <span className="text-surface-400 px-1">…</span>}
+          {page < pages - 3 && <span className="text-surface-400 dark:text-surface-500 px-1">…</span>}
           <PageBtn n={pages} current={page} onClick={onPageChange} />
         </>
       )}
@@ -82,7 +86,7 @@ export function Pagination({ page, pages, onPageChange }) {
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page === pages}
-        className="btn-outline px-3 py-2 text-sm disabled:opacity-40 gap-1"
+        className="inline-flex items-center gap-1 border-2 border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-950 font-semibold px-3 py-2 rounded-xl text-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Next <FiChevronRight size={14} />
       </button>
@@ -94,10 +98,10 @@ function PageBtn({ n, current, onClick }) {
   return (
     <button
       onClick={() => onClick(n)}
-      className={`w-9 h-9 rounded-xl text-sm font-semibold transition-all ${
+      className={`w-9 h-9 rounded-xl text-sm font-semibold transition-all duration-200 ${
         n === current
           ? 'bg-primary-600 text-white shadow-sm'
-          : 'btn-ghost text-surface-600'
+          : 'text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800'
       }`}
     >
       {n}
@@ -108,15 +112,15 @@ function PageBtn({ n, current, onClick }) {
 // ── ProductSkeleton ───────────────────────────────────────────
 export function ProductSkeleton() {
   return (
-    <div className="card overflow-hidden">
-      <div className="skeleton aspect-square w-full rounded-none" />
+    <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-100 dark:border-surface-700 overflow-hidden">
+      <div className="animate-pulse bg-surface-200 dark:bg-surface-700 aspect-square w-full" />
       <div className="p-3.5 space-y-2.5">
-        <div className="skeleton h-2.5 w-1/4 rounded-full" />
-        <div className="skeleton h-4 w-full rounded-lg" />
-        <div className="skeleton h-4 w-3/4 rounded-lg" />
-        <div className="skeleton h-3 w-1/3 rounded-full mt-1" />
-        <div className="skeleton h-6 w-1/2 rounded-lg mt-2" />
-        <div className="skeleton h-9 w-full rounded-xl mt-2" />
+        <div className="animate-pulse h-2.5 w-1/4 rounded-full bg-surface-200 dark:bg-surface-700" />
+        <div className="animate-pulse h-4 w-full rounded-lg bg-surface-200 dark:bg-surface-700" />
+        <div className="animate-pulse h-4 w-3/4 rounded-lg bg-surface-200 dark:bg-surface-700" />
+        <div className="animate-pulse h-3 w-1/3 rounded-full bg-surface-200 dark:bg-surface-700 mt-1" />
+        <div className="animate-pulse h-6 w-1/2 rounded-lg bg-surface-200 dark:bg-surface-700 mt-2" />
+        <div className="animate-pulse h-9 w-full rounded-xl bg-surface-200 dark:bg-surface-700 mt-2" />
       </div>
     </div>
   );
