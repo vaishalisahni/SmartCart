@@ -2,7 +2,7 @@
   "name": "SmartCart",
   "short_name": "SmartCart",
   "description": "AI-powered smart shopping platform",
-  "theme_color": "#4f46e5",
+  "theme_color": "#247370",
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",

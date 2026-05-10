@@ -15,16 +15,17 @@ const floatingShapes = [
 
 const GOOGLE_URL = `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}/api/auth/google`;
 
+// Dark teal gradient — matches SmartCart primary palette
+const DARK_PANEL_BG = 'linear-gradient(135deg, #0a1f1e 0%, #0f2e2c 40%, #163d3b 100%)';
+
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { loading, error } = useSelector(s => s.auth);
 
-  // 'login' or 'register'
   const [mode, setMode] = useState(() => searchParams.get('mode') === 'register' ? 'register' : 'login');
   const [animating, setAnimating] = useState(false);
-  const [panelSide, setPanelSide] = useState('left'); // which side the dark panel is on
   const [formVisible, setFormVisible] = useState(true);
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
@@ -34,25 +35,12 @@ export default function LoginPage() {
   useEffect(() => { dispatch(clearError()); }, []);
   useEffect(() => { if (error) toast.error(error); }, [error]);
 
-  // Sync panelSide with mode on mount
-  useEffect(() => {
-    setPanelSide(mode === 'login' ? 'left' : 'right');
-  }, []);
-
   const switchMode = (next) => {
     if (animating || next === mode) return;
     setAnimating(true);
     setFormVisible(false);
-
-    setTimeout(() => {
-      setMode(next);
-      setPanelSide(next === 'login' ? 'left' : 'right');
-    }, 300);
-
-    setTimeout(() => {
-      setFormVisible(true);
-      setAnimating(false);
-    }, 650);
+    setTimeout(() => { setMode(next); }, 300);
+    setTimeout(() => { setFormVisible(true); setAnimating(false); }, 650);
   };
 
   const handleLogin = async e => {
@@ -77,58 +65,55 @@ export default function LoginPage() {
           from { transform: translateY(0) rotate(0deg); }
           to   { transform: translateY(-18px) rotate(8deg); }
         }
-        @keyframes panelSlideLeft {
-          from { transform: translateX(0%); }
-          to   { transform: translateX(0%); }
-        }
-        .panel-dark {
-          transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        .form-panel {
-          transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        .mode-login .panel-dark  { order: 1; }
-        .mode-login .form-panel  { order: 2; }
-        .mode-register .panel-dark  { order: 2; }
-        .mode-register .form-panel  { order: 1; }
       `}</style>
 
-      {/* Wrapper — flips flex direction based on mode */}
-      <div className={`flex w-full transition-all duration-600 ${mode === 'register' ? 'flex-row-reverse' : 'flex-row'}`}
-        style={{ transition: 'all 0.6s cubic-bezier(0.77,0,0.175,1)' }}>
+      <div
+        className="flex w-full"
+        style={{ transition: 'all 0.6s cubic-bezier(0.77,0,0.175,1)', flexDirection: mode === 'register' ? 'row-reverse' : 'row' }}
+      >
 
-        {/* ── DARK PANEL ── */}
-        <div className="hidden lg:flex w-5/12 relative overflow-hidden flex-col items-center justify-center p-12 flex-shrink-0"
-          style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
-
+        {/* ── DARK TEAL PANEL ── */}
+        <div
+          className="hidden lg:flex w-5/12 relative overflow-hidden flex-col items-center justify-center p-12 flex-shrink-0"
+          style={{ background: DARK_PANEL_BG }}
+        >
           {/* dot grid */}
-          <div className="absolute inset-0 opacity-[0.07]"
-            style={{ backgroundImage: 'radial-gradient(circle, #a5b4fc 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{ backgroundImage: 'radial-gradient(circle, #7cc7c3 1px, transparent 1px)', backgroundSize: '26px 26px' }}
+          />
 
-          {/* glow orb */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%)', filter: 'blur(50px)' }} />
+          {/* glow orb — teal */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(46,143,138,0.35) 0%, transparent 70%)', filter: 'blur(50px)' }}
+          />
 
           {/* floating rings */}
           {floatingShapes.map((s, i) => (
-            <div key={i} className="absolute rounded-full border border-indigo-400/30"
+            <div
+              key={i}
+              className="absolute rounded-full border border-teal-400/25"
               style={{ width: s.size, height: s.size, top: s.top, left: s.left, opacity: s.op,
-                animation: `floatUp ${s.dur} ease-in-out infinite alternate`, animationDelay: s.delay }} />
+                animation: `floatUp ${s.dur} ease-in-out infinite alternate`, animationDelay: s.delay }}
+            />
           ))}
 
-          {/* Content — transitions with mode */}
+          {/* Content */}
           <div className={`relative z-10 text-center max-w-xs transition-all duration-500 ${formVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             <div className="w-16 h-16 mx-auto mb-8 rounded-2xl bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center">
               <FiShoppingBag size={28} className="text-white" />
             </div>
 
-            <h2 className="text-[2.2rem] font-black text-white leading-tight mb-4"
-              style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-1.5px' }}>
+            <h2
+              className="text-[2.2rem] font-black text-white leading-tight mb-4"
+              style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-1.5px' }}
+            >
               {mode === 'login'
                 ? 'Your smart shopping starts here.'
                 : 'Join 50,000+ smart shoppers today.'}
             </h2>
-            <p className="text-indigo-200 text-sm leading-relaxed mb-10">
+            <p className="text-teal-200 text-sm leading-relaxed mb-10">
               {mode === 'login'
                 ? 'Discover personalised deals powered by AI. Save more, smile more.'
                 : 'Get AI recommendations, exclusive deals, and the fastest checkout.'}
@@ -142,21 +127,25 @@ export default function LoginPage() {
               ))}
             </div>
 
-            {/* Switch CTA on the dark panel */}
+            {/* Switch CTA */}
             <div className="mt-12 pt-8 border-t border-white/10">
               {mode === 'login' ? (
                 <>
                   <p className="text-white/50 text-sm mb-3">New to SmartCart?</p>
-                  <button onClick={() => switchMode('register')}
-                    className="px-6 py-2.5 rounded-full border-2 border-white/30 text-white text-sm font-bold hover:bg-white hover:text-indigo-900 transition-all duration-300">
+                  <button
+                    onClick={() => switchMode('register')}
+                    className="px-6 py-2.5 rounded-full border-2 border-white/30 text-white text-sm font-bold hover:bg-white hover:text-teal-900 transition-all duration-300"
+                  >
                     Create Account →
                   </button>
                 </>
               ) : (
                 <>
                   <p className="text-white/50 text-sm mb-3">Already a member?</p>
-                  <button onClick={() => switchMode('login')}
-                    className="px-6 py-2.5 rounded-full border-2 border-white/30 text-white text-sm font-bold hover:bg-white hover:text-indigo-900 transition-all duration-300">
+                  <button
+                    onClick={() => switchMode('login')}
+                    className="px-6 py-2.5 rounded-full border-2 border-white/30 text-white text-sm font-bold hover:bg-white hover:text-teal-900 transition-all duration-300"
+                  >
                     ← Sign In
                   </button>
                 </>
@@ -169,7 +158,7 @@ export default function LoginPage() {
         <div className="flex-1 flex items-center justify-center p-8 lg:p-16">
           <div className={`w-full max-w-[400px] transition-all duration-500 ${formVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
 
-            {/* mobile logo */}
+            {/* Mobile logo */}
             <div className="lg:hidden flex items-center gap-2 mb-8">
               <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
                 <FiShoppingBag size={18} className="text-white" />
@@ -178,8 +167,10 @@ export default function LoginPage() {
             </div>
 
             {/* Heading */}
-            <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-1"
-              style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-0.5px' }}>
+            <h1
+              className="text-3xl font-black text-gray-900 dark:text-white mb-1"
+              style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-0.5px' }}
+            >
               {mode === 'login' ? 'Hello, Welcome back! 👋' : 'Create your account ✨'}
             </h1>
             <p className="text-gray-400 text-sm mb-8">
@@ -187,8 +178,10 @@ export default function LoginPage() {
             </p>
 
             {/* Google */}
-            <button onClick={() => window.location.href = GOOGLE_URL}
-              className="w-full flex items-center justify-center gap-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:border-primary-300 hover:shadow-md transition-all mb-5 group">
+            <button
+              onClick={() => window.location.href = GOOGLE_URL}
+              className="w-full flex items-center justify-center gap-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:border-primary-300 hover:shadow-md transition-all mb-5"
+            >
               <GoogleIcon />
               Continue with Google
             </button>
@@ -201,23 +194,33 @@ export default function LoginPage() {
                 <Field label="Email address">
                   <div className="relative">
                     <FiMail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="email" value={loginForm.email}
+                    <input
+                      type="email" value={loginForm.email}
                       onChange={e => setLoginForm(f => ({ ...f, email: e.target.value }))}
                       placeholder="you@example.com" autoComplete="email"
                       className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-gray-700 transition-all"
-                      required />
+                      required
+                    />
                   </div>
                 </Field>
 
-                <Field label="Password"
-                  right={<button type="button" onClick={() => navigate('/forgot-password')} className="text-xs text-primary-600 font-semibold hover:underline">Forgot password?</button>}>
+                <Field
+                  label="Password"
+                  right={
+                    <button type="button" onClick={() => navigate('/forgot-password')} className="text-xs text-primary-600 font-semibold hover:underline">
+                      Forgot password?
+                    </button>
+                  }
+                >
                   <div className="relative">
                     <FiLock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type={showPwd ? 'text' : 'password'} value={loginForm.password}
+                    <input
+                      type={showPwd ? 'text' : 'password'} value={loginForm.password}
                       onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
                       placeholder="••••••••" autoComplete="current-password"
                       className="w-full pl-10 pr-11 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-gray-700 transition-all"
-                      required />
+                      required
+                    />
                     <button type="button" onClick={() => setShowPwd(!showPwd)}
                       className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                       {showPwd ? <FiEyeOff size={15} /> : <FiEye size={15} />}
@@ -235,22 +238,26 @@ export default function LoginPage() {
                 <Field label="Full Name">
                   <div className="relative">
                     <FiUser size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input value={regForm.name}
+                    <input
+                      value={regForm.name}
                       onChange={e => setRegForm(f => ({ ...f, name: e.target.value }))}
                       placeholder="Your full name" autoComplete="name"
                       className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-gray-700 transition-all"
-                      required />
+                      required
+                    />
                   </div>
                 </Field>
 
                 <Field label="Email address">
                   <div className="relative">
                     <FiMail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="email" value={regForm.email}
+                    <input
+                      type="email" value={regForm.email}
                       onChange={e => setRegForm(f => ({ ...f, email: e.target.value }))}
                       placeholder="you@example.com" autoComplete="email"
                       className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-gray-700 transition-all"
-                      required />
+                      required
+                    />
                   </div>
                 </Field>
 
@@ -258,21 +265,25 @@ export default function LoginPage() {
                   <Field label="Password">
                     <div className="relative">
                       <FiLock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input type={showPwd ? 'text' : 'password'} value={regForm.password}
+                      <input
+                        type={showPwd ? 'text' : 'password'} value={regForm.password}
                         onChange={e => setRegForm(f => ({ ...f, password: e.target.value }))}
                         placeholder="Min 6"
                         className="w-full pl-10 pr-3 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-gray-700 transition-all"
-                        required />
+                        required
+                      />
                     </div>
                   </Field>
                   <Field label="Confirm">
                     <div className="relative">
                       <FiLock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input type={showPwd ? 'text' : 'password'} value={regForm.confirm}
+                      <input
+                        type={showPwd ? 'text' : 'password'} value={regForm.confirm}
                         onChange={e => setRegForm(f => ({ ...f, confirm: e.target.value }))}
                         placeholder="Repeat"
                         className="w-full pl-10 pr-3 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-gray-700 transition-all"
-                        required />
+                        required
+                      />
                     </div>
                   </Field>
                 </div>
@@ -280,7 +291,7 @@ export default function LoginPage() {
                 <label className="flex items-center gap-2.5 cursor-pointer select-none">
                   <input type="checkbox" className="w-4 h-4 accent-primary-600 rounded" required />
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    I agree to the <span className="text-primary-600 font-semibold cursor-pointer hover:underline">Terms</span> & <span className="text-primary-600 font-semibold cursor-pointer hover:underline">Privacy Policy</span>
+                    I agree to the <span className="text-primary-600 font-semibold cursor-pointer hover:underline">Terms</span> &amp; <span className="text-primary-600 font-semibold cursor-pointer hover:underline">Privacy Policy</span>
                   </span>
                 </label>
 
@@ -293,16 +304,14 @@ export default function LoginPage() {
               {mode === 'login' ? (
                 <p className="text-sm text-gray-400">
                   Don't have an account?{' '}
-                  <button onClick={() => switchMode('register')}
-                    className="text-primary-600 font-bold hover:underline transition-all">
+                  <button onClick={() => switchMode('register')} className="text-primary-600 font-bold hover:underline transition-all">
                     Create account
                   </button>
                 </p>
               ) : (
                 <p className="text-sm text-gray-400">
                   Already have an account?{' '}
-                  <button onClick={() => switchMode('login')}
-                    className="text-primary-600 font-bold hover:underline transition-all">
+                  <button onClick={() => switchMode('login')} className="text-primary-600 font-bold hover:underline transition-all">
                     Sign in
                   </button>
                 </p>
@@ -315,7 +324,7 @@ export default function LoginPage() {
   );
 }
 
-/* ─── FORGOT PASSWORD (standalone page) ─────────────── */
+/* ─── FORGOT PASSWORD ─────────────────────────────────────── */
 export function ForgotPasswordPage() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
@@ -349,10 +358,18 @@ export function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex bg-white dark:bg-gray-950">
-      <div className="hidden lg:flex w-5/12 relative overflow-hidden flex-col items-center justify-center p-12"
-        style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
-        <div className="absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: 'radial-gradient(circle, #a5b4fc 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
+      <div
+        className="hidden lg:flex w-5/12 relative overflow-hidden flex-col items-center justify-center p-12"
+        style={{ background: DARK_PANEL_BG }}
+      >
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{ backgroundImage: 'radial-gradient(circle, #7cc7c3 1px, transparent 1px)', backgroundSize: '26px 26px' }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(46,143,138,0.35) 0%, transparent 70%)', filter: 'blur(50px)' }}
+        />
         <div className="relative z-10 text-center max-w-xs">
           <div className="w-16 h-16 mx-auto mb-8 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center">
             <FiShoppingBag size={28} className="text-white" />
@@ -360,7 +377,7 @@ export function ForgotPasswordPage() {
           <h2 className="text-[2.2rem] font-black text-white leading-tight mb-4" style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-1.5px' }}>
             Reset your password securely.
           </h2>
-          <p className="text-indigo-200 text-sm">We'll send a one-time password to your email to get you back in.</p>
+          <p className="text-teal-200 text-sm">We'll send a one-time password to your email to get you back in.</p>
         </div>
       </div>
 
@@ -412,16 +429,14 @@ export function ForgotPasswordPage() {
   );
 }
 
-/* ─── RE-EXPORTS for separate route files ────────────── */
+/* ─── RE-EXPORTS ────────────────────────────────────────────── */
 export function RegisterPage() {
-  // Register is now handled inside LoginPage via mode switching
-  // This redirect ensures /register URL still works
   const navigate = useNavigate();
   useEffect(() => { navigate('/login?mode=register', { replace: true }); }, []);
   return null;
 }
 
-/* ─── HELPERS ──────────────────────────────────────────── */
+/* ─── HELPERS ──────────────────────────────────────────────── */
 function Field({ label, right, children }) {
   return (
     <div>
@@ -446,8 +461,10 @@ function Divider({ label }) {
 
 function SubmitBtn({ loading, label, loadingLabel }) {
   return (
-    <button type="submit" disabled={loading}
-      className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white font-bold rounded-xl text-sm transition-all duration-200 active:scale-[0.98] shadow-lg shadow-primary-200 dark:shadow-none">
+    <button
+      type="submit" disabled={loading}
+      className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white font-bold rounded-xl text-sm transition-all duration-200 active:scale-[0.98] shadow-lg shadow-primary-200/50 dark:shadow-none"
+    >
       {loading ? (
         <span className="flex items-center justify-center gap-2">
           <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

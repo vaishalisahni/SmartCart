@@ -14,7 +14,7 @@ export default function CheckoutPage() {
   const { user } = useSelector(s => s.auth);
   const couponCode = location.state?.couponCode || '';
 
-  const [step, setStep] = useState(1); // 1=address, 2=payment
+  const [step, setStep] = useState(1);
   const [address, setAddress] = useState({ fullName: user?.name || '', phone: '', street: '', city: '', state: '', pincode: '' });
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [loading, setLoading] = useState(false);
@@ -65,7 +65,7 @@ export default function CheckoutPage() {
           else toast.error('Payment verification failed');
         },
         prefill: { name: user.name, email: user.email, contact: address.phone },
-        theme: { color: '#6366f1' },
+        theme: { color: '#247370' }, // ✅ SmartCart teal
       };
       const rzp = new window.Razorpay(options);
       rzp.on('payment.failed', () => toast.error('Payment failed'));
@@ -85,7 +85,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Load Razorpay script */}
       {!window.Razorpay && <script src="https://checkout.razorpay.com/v1/checkout.js" />}
 
       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
@@ -94,7 +93,7 @@ export default function CheckoutPage() {
       <div className="flex items-center gap-4 mb-8">
         {['Shipping Address', 'Payment'].map((s, i) => (
           <div key={s} className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${step > i + 1 ? 'bg-green-500 text-white' : step === i + 1 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${step > i + 1 ? 'bg-emerald-500 text-white' : step === i + 1 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
               {step > i + 1 ? <FiCheck size={14} /> : i + 1}
             </div>
             <span className={`text-sm font-medium ${step === i + 1 ? 'text-primary-600' : 'text-gray-500'}`}>{s}</span>
@@ -184,7 +183,7 @@ export default function CheckoutPage() {
             <div className="space-y-1.5 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">Subtotal</span><span>₹{subtotal.toLocaleString()}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">GST (18%)</span><span>₹{tax.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Shipping</span><span className={shipping === 0 ? 'text-green-600' : ''}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Shipping</span><span className={shipping === 0 ? 'text-emerald-600' : ''}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span></div>
               <hr className="border-gray-200 dark:border-gray-700" />
               <div className="flex justify-between font-bold text-base"><span>Total</span><span>₹{total.toLocaleString()}</span></div>
             </div>

@@ -6,7 +6,14 @@ import API from '../../services/api';
 import { PageLoader } from '../../components/ui/index';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const STATUS_COLORS = { placed: 'bg-blue-100 text-blue-700', confirmed: 'bg-indigo-100 text-indigo-700', packed: 'bg-yellow-100 text-yellow-700', shipped: 'bg-orange-100 text-orange-700', delivered: 'bg-green-100 text-green-700', cancelled: 'bg-red-100 text-red-700' };
+const STATUS_COLORS = {
+  placed: 'bg-primary-100 text-primary-700',
+  confirmed: 'bg-teal-100 text-teal-700',
+  packed: 'bg-yellow-100 text-yellow-700',
+  shipped: 'bg-orange-100 text-orange-700',
+  delivered: 'bg-green-100 text-green-700',
+  cancelled: 'bg-red-100 text-red-700',
+};
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);
@@ -26,10 +33,10 @@ export default function AdminDashboard() {
   }));
 
   const stats = [
-    { label: 'Total Users', value: data.stats.totalUsers, icon: <FiUsers size={22} />, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-    { label: 'Total Products', value: data.stats.totalProducts, icon: <FiShoppingBag size={22} />, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-    { label: 'Total Orders', value: data.stats.totalOrders, icon: <FiPackage size={22} />, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-    { label: 'Total Revenue', value: `₹${data.stats.totalRevenue?.toLocaleString()}`, icon: <FiDollarSign size={22} />, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
+    { label: 'Total Users',    value: data.stats.totalUsers,                      icon: <FiUsers size={22} />,      color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20' },
+    { label: 'Total Products', value: data.stats.totalProducts,                   icon: <FiShoppingBag size={22} />, color: 'text-purple-500',  bg: 'bg-purple-50 dark:bg-purple-900/20' },
+    { label: 'Total Orders',   value: data.stats.totalOrders,                     icon: <FiPackage size={22} />,    color: 'text-orange-500',  bg: 'bg-orange-50 dark:bg-orange-900/20' },
+    { label: 'Total Revenue',  value: `₹${data.stats.totalRevenue?.toLocaleString()}`, icon: <FiDollarSign size={22} />, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
   ];
 
   return (
@@ -60,7 +67,7 @@ export default function AdminDashboard() {
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={v => [`₹${v?.toLocaleString()}`, 'Revenue']} />
-                <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={2.5} dot={{ fill: '#6366f1' }} />
+                <Line type="monotone" dataKey="revenue" stroke="#247370" strokeWidth={2.5} dot={{ fill: '#247370' }} />
               </LineChart>
             </ResponsiveContainer>
           ) : <p className="text-gray-400 text-sm text-center py-10">No sales data yet</p>}
@@ -75,7 +82,7 @@ export default function AdminDashboard() {
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Bar dataKey="orders" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="orders" fill="#247370" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : <p className="text-gray-400 text-sm text-center py-10">No orders data yet</p>}
