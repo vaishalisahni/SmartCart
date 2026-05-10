@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiTag } from 'react-icons/fi';
+import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiTag, FiArrowRight } from 'react-icons/fi';
 import { updateCartItem, removeFromCart } from '../store/slices/cartSlice';
 import { EmptyState } from '../components/ui/index';
 import API from '../services/api';
@@ -12,8 +12,8 @@ export default function CartPage() {
   const navigate = useNavigate();
   const { cart, loading } = useSelector(s => s.cart);
   const { user }          = useSelector(s => s.auth);
-  const [couponCode, setCouponCode]     = useState('');
-  const [couponData, setCouponData]     = useState(null);
+  const [couponCode, setCouponCode]         = useState('');
+  const [couponData, setCouponData]         = useState(null);
   const [applyingCoupon, setApplyingCoupon] = useState(false);
 
   const items    = cart?.items?.filter(i => i.product?.isActive) || [];
@@ -47,8 +47,8 @@ export default function CartPage() {
   if (!user) return (
     <div className="max-w-4xl mx-auto px-4 py-16 text-center">
       <div className="text-6xl mb-4">🛒</div>
-      <h2 className="text-2xl font-bold mb-2 text-surface-900 dark:text-surface-100">Your Cart</h2>
-      <p className="text-surface-500 mb-6">Please login to view your cart.</p>
+      <h2 className="text-2xl font-bold mb-2 text-surface-900 dark:text-surface-50">Your Cart</h2>
+      <p className="text-surface-500 dark:text-surface-400 mb-6">Please login to view your cart.</p>
       <Link to="/login" className="btn-primary">Login</Link>
     </div>
   );
@@ -64,8 +64,8 @@ export default function CartPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6 text-surface-900 dark:text-surface-100">
-        Shopping Cart <span className="text-surface-400 text-lg font-normal">({items.length} items)</span>
+      <h1 className="text-2xl font-bold mb-6 text-surface-900 dark:text-surface-50">
+        Shopping Cart <span className="text-surface-400 dark:text-surface-500 text-lg font-normal">({items.length} items)</span>
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -81,24 +81,27 @@ export default function CartPage() {
                 />
               </Link>
               <div className="flex-1 min-w-0">
-                <Link to={`/products/${item.product._id}`} className="font-semibold text-sm hover:text-primary-600 dark:hover:text-primary-400 line-clamp-2 text-surface-800 dark:text-surface-100">
+                <Link
+                  to={`/products/${item.product._id}`}
+                  className="font-semibold text-sm hover:text-primary-600 dark:hover:text-primary-400 line-clamp-2 text-surface-800 dark:text-surface-100"
+                >
                   {item.product.name}
                 </Link>
                 <p className="text-primary-600 dark:text-primary-400 font-bold mt-1">
                   ₹{item.product.price?.toLocaleString()}
                 </p>
                 {item.product.stock < 10 && (
-                  <p className="text-amber-500 text-xs mt-0.5">Only {item.product.stock} left!</p>
+                  <p className="text-amber-500 dark:text-amber-400 text-xs mt-0.5">Only {item.product.stock} left!</p>
                 )}
               </div>
               <div className="flex flex-col items-end justify-between gap-2">
                 <button
                   onClick={() => handleRemove(item.product._id)}
-                  className="text-red-400 hover:text-red-600 transition"
+                  className="text-red-400 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300 transition"
                 >
                   <FiTrash2 size={16} />
                 </button>
-                <div className="flex items-center border border-surface-300 dark:border-surface-600 rounded-lg overflow-hidden">
+                <div className="flex items-center border border-surface-200 dark:border-surface-600 rounded-lg overflow-hidden bg-white dark:bg-surface-800">
                   <button
                     onClick={() => handleQty(item.product._id, item.quantity - 1)}
                     className="px-2 py-1 hover:bg-surface-100 dark:hover:bg-surface-700 transition text-surface-700 dark:text-surface-300"
@@ -117,7 +120,7 @@ export default function CartPage() {
                     <FiPlus size={12} />
                   </button>
                 </div>
-                <p className="text-sm font-bold text-surface-900 dark:text-white">
+                <p className="text-sm font-bold text-surface-900 dark:text-surface-100">
                   ₹{(item.product.price * item.quantity).toLocaleString()}
                 </p>
               </div>
@@ -144,7 +147,7 @@ export default function CartPage() {
               </button>
             </div>
             {couponData && (
-              <p className="text-emerald-600 text-xs mt-2 font-medium">✓ Saving ₹{couponData.discount}!</p>
+              <p className="text-emerald-600 dark:text-emerald-400 text-xs mt-2 font-medium">✓ Saving ₹{couponData.discount}!</p>
             )}
           </div>
 
@@ -162,28 +165,28 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-surface-500 dark:text-surface-400">Shipping</span>
-                <span className={shipping === 0 ? 'text-emerald-600 font-medium' : 'text-surface-800 dark:text-surface-200'}>
+                <span className={shipping === 0 ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-surface-800 dark:text-surface-200'}>
                   {shipping === 0 ? 'FREE' : `₹${shipping}`}
                 </span>
               </div>
               {discount > 0 && (
-                <div className="flex justify-between text-emerald-600">
+                <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
                   <span>Coupon Discount</span>
                   <span>−₹{discount}</span>
                 </div>
               )}
               <div className="divider" />
-              <div className="flex justify-between font-bold text-base text-surface-900 dark:text-white">
+              <div className="flex justify-between font-bold text-base text-surface-900 dark:text-surface-100">
                 <span>Total</span>
                 <span>₹{total.toLocaleString()}</span>
               </div>
             </div>
-            <button onClick={handleCheckout} className="btn-primary w-full py-3 text-base font-bold mt-2">
-              Proceed to Checkout
+            <button onClick={handleCheckout} className="btn-primary w-full py-3 text-base font-bold mt-2 flex items-center justify-center gap-2">
+              Proceed to Checkout <FiArrowRight size={16} />
             </button>
             <Link
               to="/products"
-              className="block text-center text-sm text-primary-600 dark:text-primary-400 hover:underline"
+              className="block text-center text-sm text-primary-600 dark:text-primary-400 hover:underline mt-2"
             >
               Continue Shopping
             </Link>
