@@ -32,17 +32,6 @@ export default function Footer() {
             <li><Link to="/cart" className="hover:text-white transition">Cart</Link></li>
           </ul>
         </div>
-        <div>
-          <h4 className="text-white font-semibold mb-3">Tech Stack</h4>
-          <ul className="space-y-1 text-xs">
-            <li>⚛️ React + Vite + Tailwind CSS</li>
-            <li>🟢 Node.js + Express.js</li>
-            <li>🍃 MongoDB + Mongoose</li>
-            <li>🐍 Python Flask (AI/ML)</li>
-            <li>🤖 Scikit-learn + VADER</li>
-            <li>💳 Razorpay Payments</li>
-          </ul>
-        </div>
       </div>
       <div className="border-t border-gray-800 py-4 text-center text-xs">
         <p>© 2025 SmartCart — B.Tech AI & ML Major Project | Shivalik College of Engineering</p>
