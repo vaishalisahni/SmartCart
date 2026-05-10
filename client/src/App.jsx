@@ -73,7 +73,12 @@ export default function App() {
           <Route path="coupons" element={<AdminCoupons />} />
         </Route>
 
-        {/* Public + User */}
+        {/* Auth pages — NO navbar, fullscreen */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        {/* All other pages — WITH navbar */}
         <Route path="/*" element={
           <div className="flex flex-col min-h-screen">
             <Navbar />
@@ -89,9 +94,6 @@ export default function App() {
                 <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
                 <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>
