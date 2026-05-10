@@ -1,113 +1,348 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
-import { FiMessageCircle, FiX, FiSend, FiMinus } from 'react-icons/fi';
+import { FiMessageCircle, FiX, FiSend, FiMinus, FiUser, FiCpu } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const API_BASE   = import.meta.env.VITE_API_URL || '/api';
+
+// ── Typing dots indicator ─────────────────────────────────────
+function TypingDots() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px' }}>
+      {[0, 0.2, 0.4].map((d, i) => (
+        <div key={i} style={{
+          width: '6px', height: '6px', borderRadius: '50%',
+          background: '#6b7280',
+          animation: 'bounce 1.2s ease-in-out infinite',
+          animationDelay: `${d}s`,
+        }} />
+      ))}
+      <style>{`@keyframes bounce{0%,80%,100%{transform:scale(0.6)}40%{transform:scale(1)}}`}</style>
+    </div>
+  );
+}
+
+// ── AI Bot reply via your backend ─────────────────────────────
+async function getAIReply(userMessage, history) {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const res = await fetch(`${API_BASE}/ai/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ message: userMessage, history }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const data = await res.json();
+    return data.reply || "I'm not sure about that. Let me connect you to a human agent!";
+  } catch {
+    return "Sorry, I'm having trouble right now. A human agent will assist you shortly.";
+  }
+}
+
+// ── Quick reply buttons ───────────────────────────────────────
+const QUICK_REPLIES = [
+  'Track my order',
+  'Return policy',
+  'Payment methods',
+  'Cancel order',
+];
 
 export default function LiveChat() {
   const { user } = useSelector(s => s.auth);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]           = useState(false);
   const [minimized, setMinimized] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [text, setText] = useState('');
-  const [typing, setTyping] = useState(false);
+  const [messages, setMessages]   = useState([]);
+  const [text, setText]           = useState('');
+  const [aiTyping, setAiTyping]   = useState(false);
+  const [humanTyping, setHumanTyping] = useState(false);
+  const [mode, setMode]           = useState('bot'); // 'bot' | 'human'
+  const [unread, setUnread]       = useState(0);
   const socketRef = useRef(null);
   const bottomRef = useRef(null);
-  const roomId = user ? `user_${user._id}` : null;
+  const roomId    = user ? `user_${user._id}` : null;
 
+  // Welcome message on first open
   useEffect(() => {
-    if (!open || !user) return;
+    if (open && messages.length === 0) {
+      setMessages([{
+        id: Date.now(),
+        text: `Hi ${user?.name?.split(' ')[0] || 'there'}! 👋 I'm SmartCart AI. How can I help you today?`,
+        isBot: true,
+        isAdmin: false,
+        time: new Date(),
+      }]);
+    }
+  }, [open]);
+
+  // Socket for human agent mode
+  useEffect(() => {
+    if (!open || !user || mode !== 'human') return;
     const socket = io(SOCKET_URL);
     socketRef.current = socket;
     socket.emit('user:join', user._id);
     socket.emit('room:join', roomId);
     socket.on('message:new', (msg) => {
-      setMessages(prev => [...prev, msg]);
+      if (msg.isAdmin) {
+        setMessages(prev => [...prev, { ...msg, id: Date.now() }]);
+        if (!open || minimized) setUnread(n => n + 1);
+      }
     });
-    socket.on('typing:update', ({ typing: t }) => setTyping(t));
+    socket.on('typing:update', ({ typing }) => setHumanTyping(typing));
     return () => socket.disconnect();
-  }, [open, user]);
+  }, [open, user, mode]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, aiTyping]);
 
-  const sendMessage = () => {
-    if (!text.trim() || !socketRef.current) return;
-    socketRef.current.emit('message:send', {
-      roomId, senderId: user._id, senderName: user.name, text, isAdmin: false,
-    });
-    setText('');
-  };
+  useEffect(() => {
+    if (open) setUnread(0);
+  }, [open]);
 
   const handleTyping = (val) => {
     setText(val);
-    if (socketRef.current) {
+    if (mode === 'human' && socketRef.current) {
       socketRef.current.emit('typing:start', { roomId, userName: user.name });
       clearTimeout(window._typingTimer);
-      window._typingTimer = setTimeout(() => socketRef.current?.emit('typing:stop', { roomId }), 1000);
+      window._typingTimer = setTimeout(
+        () => socketRef.current?.emit('typing:stop', { roomId }), 1000
+      );
+    }
+  };
+
+  const sendMessage = async (messageText) => {
+    const msg = (messageText || text).trim();
+    if (!msg) return;
+
+    const userMsg = { id: Date.now(), text: msg, isBot: false, isAdmin: false, time: new Date() };
+    setMessages(prev => [...prev, userMsg]);
+    setText('');
+
+    if (mode === 'bot') {
+      // Check if user wants human agent
+      const wantsHuman = /human|agent|person|representative|support team/i.test(msg);
+      if (wantsHuman) {
+        setAiTyping(true);
+        await new Promise(r => setTimeout(r, 800));
+        setAiTyping(false);
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          text: "Connecting you to a human support agent now. Please wait a moment...",
+          isBot: true, isAdmin: false, time: new Date(),
+        }]);
+        setMode('human');
+        return;
+      }
+
+      // AI reply
+      setAiTyping(true);
+      const history = messages.slice(-6).map(m => ({
+        role: m.isBot || m.isAdmin ? 'assistant' : 'user',
+        content: m.text,
+      }));
+      const reply = await getAIReply(msg, history);
+      setAiTyping(false);
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: reply,
+        isBot: true, isAdmin: false, time: new Date(),
+      }]);
+    } else {
+      // Human agent mode — send via socket
+      if (socketRef.current) {
+        socketRef.current.emit('message:send', {
+          roomId, senderId: user._id, senderName: user.name, text: msg, isAdmin: false,
+        });
+      }
     }
   };
 
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
       {open && !minimized && (
-        <div className="w-80 card shadow-xl flex flex-col overflow-hidden" style={{ height: '420px' }}>
+        <div style={{
+          width: '340px', height: '480px',
+          background: 'white', borderRadius: '16px',
+          boxShadow: '0 20px 60px rgba(0,0,0,.15)',
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          border: '1px solid rgba(0,0,0,.08)',
+        }}>
           {/* Header */}
-          <div className="bg-primary-600 text-white px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
-              <span className="font-semibold text-sm">SmartCart Support</span>
+          <div style={{
+            background: '#247370', color: 'white',
+            padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '50%',
+                background: 'rgba(255,255,255,.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {mode === 'bot' ? <FiCpu size={18} /> : <FiUser size={18} />}
+              </div>
+              <div>
+                <p style={{ fontWeight: 600, fontSize: '14px', margin: 0 }}>
+                  {mode === 'bot' ? 'SmartCart AI' : 'Support Agent'}
+                </p>
+                <p style={{ fontSize: '11px', opacity: .8, margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
+                  {mode === 'bot' ? 'AI Assistant' : 'Live Support'}
+                </p>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setMinimized(true)} className="text-white/70 hover:text-white"><FiMinus size={14} /></button>
-              <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white"><FiX size={14} /></button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {mode === 'human' && (
+                <button
+                  onClick={() => setMode('bot')}
+                  title="Switch to AI"
+                  style={{ background: 'rgba(255,255,255,.2)', border: 'none', color: 'white', borderRadius: '6px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}
+                >
+                  <FiCpu size={12} style={{ verticalAlign: 'middle', marginRight: '3px' }} />AI
+                </button>
+              )}
+              <button onClick={() => setMinimized(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', padding: '2px' }}>
+                <FiMinus size={14} />
+              </button>
+              <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', padding: '2px' }}>
+                <FiX size={14} />
+              </button>
             </div>
           </div>
+
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-50 dark:bg-gray-900">
-            {messages.length === 0 && (
-              <div className="text-center text-gray-400 text-xs mt-8">
-                <p className="text-2xl mb-2">👋</p>
-                <p>Hi {user.name}! How can we help you today?</p>
-              </div>
-            )}
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.isAdmin ? 'justify-start' : 'justify-end'}`}>
-                <div className={`max-w-[70%] px-3 py-2 rounded-2xl text-sm ${m.isAdmin ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-none' : 'bg-primary-600 text-white rounded-br-none'}`}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#f9fafb' }}>
+            {messages.map((m) => (
+              <div key={m.id} style={{ display: 'flex', justifyContent: m.isBot || m.isAdmin ? 'flex-start' : 'flex-end' }}>
+                {(m.isBot || m.isAdmin) && (
+                  <div style={{
+                    width: '24px', height: '24px', borderRadius: '50%',
+                    background: m.isBot ? '#247370' : '#6366f1',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginRight: '6px', flexShrink: 0, alignSelf: 'flex-end',
+                  }}>
+                    {m.isBot ? <FiCpu size={12} color="white" /> : <FiUser size={12} color="white" />}
+                  </div>
+                )}
+                <div style={{
+                  maxWidth: '72%',
+                  padding: '8px 12px',
+                  borderRadius: m.isBot || m.isAdmin ? '16px 16px 16px 4px' : '16px 16px 4px 16px',
+                  background: m.isBot || m.isAdmin ? 'white' : '#247370',
+                  color: m.isBot || m.isAdmin ? '#111827' : 'white',
+                  fontSize: '13px',
+                  lineHeight: 1.5,
+                  boxShadow: '0 1px 3px rgba(0,0,0,.08)',
+                }}>
                   {m.text}
+                  <div style={{ fontSize: '10px', opacity: .5, marginTop: '3px', textAlign: 'right' }}>
+                    {new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
                 </div>
               </div>
             ))}
-            {typing && (
-              <div className="flex justify-start">
-                <div className="bg-white dark:bg-gray-800 px-3 py-2 rounded-2xl rounded-bl-none text-xs text-gray-400">typing...</div>
+
+            {(aiTyping || humanTyping) && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{
+                  width: '24px', height: '24px', borderRadius: '50%',
+                  background: aiTyping ? '#247370' : '#6366f1',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {aiTyping ? <FiCpu size={12} color="white" /> : <FiUser size={12} color="white" />}
+                </div>
+                <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,.08)' }}>
+                  <TypingDots />
+                </div>
               </div>
             )}
             <div ref={bottomRef} />
           </div>
+
+          {/* Quick replies — only in bot mode and if no messages yet beyond welcome */}
+          {mode === 'bot' && messages.length <= 1 && (
+            <div style={{ padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: '6px', borderTop: '1px solid #f0f0f0', background: 'white' }}>
+              {QUICK_REPLIES.map(qr => (
+                <button
+                  key={qr}
+                  onClick={() => sendMessage(qr)}
+                  style={{
+                    fontSize: '11px', padding: '4px 10px', borderRadius: '999px',
+                    border: '1px solid #d1fae5', background: '#f0fdf4', color: '#065f46',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {qr}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Input */}
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+          <div style={{ padding: '10px 12px', borderTop: '1px solid #f0f0f0', display: 'flex', gap: '8px', background: 'white' }}>
             <input
-              value={text} onChange={e => handleTyping(e.target.value)}
+              value={text}
+              onChange={e => handleTyping(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
-              placeholder="Type a message..." className="input text-sm flex-1 py-2"
+              placeholder={mode === 'bot' ? 'Ask anything…' : 'Message support…'}
+              style={{
+                flex: 1, padding: '8px 12px', borderRadius: '20px',
+                border: '1px solid #e5e7eb', outline: 'none',
+                fontSize: '13px', background: '#f9fafb',
+              }}
             />
-            <button onClick={sendMessage} className="btn-primary p-2.5 rounded-lg">
-              <FiSend size={14} />
+            <button
+              onClick={() => sendMessage()}
+              disabled={!text.trim() || aiTyping}
+              style={{
+                width: '36px', height: '36px', borderRadius: '50%',
+                background: text.trim() && !aiTyping ? '#247370' : '#e5e7eb',
+                border: 'none', cursor: text.trim() && !aiTyping ? 'pointer' : 'not-allowed',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background .2s',
+              }}
+            >
+              <FiSend size={14} color="white" />
             </button>
           </div>
         </div>
       )}
+
+      {/* FAB button */}
       <button
-        onClick={() => { setOpen(!open); setMinimized(false); }}
-        className="w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        onClick={() => { setOpen(!open); setMinimized(false); setUnread(0); }}
+        style={{
+          width: '56px', height: '56px',
+          background: '#247370',
+          border: 'none', borderRadius: '50%',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(36,115,112,.4)',
+          transition: 'transform .2s',
+          position: 'relative',
+        }}
+        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        aria-label={open ? 'Close chat' : 'Open chat'}
       >
-        {open ? <FiX size={22} /> : <FiMessageCircle size={22} />}
+        {open ? <FiX size={22} color="white" /> : <FiMessageCircle size={22} color="white" />}
+        {unread > 0 && !open && (
+          <span style={{
+            position: 'absolute', top: '-2px', right: '-2px',
+            background: '#ef4444', color: 'white',
+            fontSize: '11px', fontWeight: 600,
+            width: '18px', height: '18px', borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {unread > 9 ? '9+' : unread}
+          </span>
+        )}
       </button>
     </div>
   );
