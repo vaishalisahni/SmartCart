@@ -71,7 +71,7 @@ export default function ProductCard({ product }) {
           className={`absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all duration-200 active:scale-90 ${
             isWishlisted
               ? 'bg-red-500 text-white'
-              : 'bg-white/90 dark:bg-surface-800/90 text-surface-500 hover:text-red-500 hover:bg-white'
+              : 'bg-white/90 dark:bg-surface-800/90 text-surface-500 hover:text-red-500 hover:bg-white dark:hover:bg-surface-700'
           }`}
           aria-label="Toggle wishlist"
         >
@@ -93,7 +93,8 @@ export default function ProductCard({ product }) {
         <div className="flex items-center gap-1 mt-0.5">
           <FiStar size={11} className="text-amber-400 fill-amber-400" />
           <span className="text-[11px] text-surface-500 dark:text-surface-400 font-medium">
-            {product.ratings?.toFixed(1)} <span className="text-surface-400">({product.numReviews})</span>
+            {product.ratings?.toFixed(1)}{' '}
+            <span className="text-surface-400">({product.numReviews})</span>
           </span>
         </div>
 
@@ -114,7 +115,7 @@ export default function ProductCard({ product }) {
           className="mt-2 w-full btn-primary text-xs py-2 gap-1.5 disabled:opacity-40"
         >
           <FiShoppingCart size={12} />
-          Add to Cart
+          {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
         </button>
       </div>
     </Link>

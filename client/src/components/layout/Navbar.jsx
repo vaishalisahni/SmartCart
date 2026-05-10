@@ -16,12 +16,13 @@ const CATEGORIES = [
 ];
 
 export default function Navbar() {
-  const dispatch   = useDispatch();
-  const navigate   = useNavigate();
-  const location   = useLocation();
-  const { user }   = useSelector(s => s.auth);
+  const dispatch     = useDispatch();
+  const navigate     = useNavigate();
+  const location     = useLocation();
+  const { user }     = useSelector(s => s.auth);
   const { darkMode } = useSelector(s => s.ui);
-  const { cart }   = useSelector(s => s.cart);
+  const { cart }     = useSelector(s => s.cart);
+
   const [search, setSearch]         = useState('');
   const [mobileMenu, setMobileMenu] = useState(false);
   const [userMenu, setUserMenu]     = useState(false);
@@ -30,10 +31,14 @@ export default function Navbar() {
   const userMenuRef = useRef(null);
   const cartCount   = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
 
-  useEffect(() => { setMobileMenu(false); setUserMenu(false); setSearchOpen(false); }, [location]);
+  useEffect(() => {
+    setMobileMenu(false);
+    setUserMenu(false);
+    setSearchOpen(false);
+  }, [location]);
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = e => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenu(false);
     };
     document.addEventListener('mousedown', handler);
@@ -50,7 +55,8 @@ export default function Navbar() {
     e.preventDefault();
     if (search.trim()) {
       navigate(`/products?search=${encodeURIComponent(search.trim())}`);
-      setSearch(''); setSearchOpen(false);
+      setSearch('');
+      setSearchOpen(false);
     }
   };
 
@@ -98,10 +104,13 @@ export default function Navbar() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search products, brands..."
-                className="w-full pl-10 pr-10 py-2.5 rounded-l-xl bg-surface-100 dark:bg-surface-800
+                className="w-full pl-10 pr-10 py-2.5 rounded-l-xl
+                           bg-surface-100 dark:bg-surface-800
                            border border-surface-200 dark:border-surface-700
-                           focus:border-primary-400 focus:bg-white dark:focus:bg-surface-750
-                           outline-none text-sm transition-all duration-200 placeholder:text-surface-400"
+                           focus:border-primary-400 focus:bg-white dark:focus:bg-surface-800
+                           outline-none text-sm transition-all duration-200
+                           placeholder:text-surface-400
+                           text-surface-900 dark:text-surface-100"
               />
               <VoiceSearch />
               <button
@@ -176,16 +185,24 @@ export default function Navbar() {
                       <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{user.name}</p>
                       <p className="text-xs text-surface-400 truncate">{user.email}</p>
                     </div>
-                    <Link to="/profile"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"><FiUser size={14} className="text-surface-400" /> Profile</Link>
-                    <Link to="/orders"   className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"><FiPackage size={14} className="text-surface-400" /> My Orders</Link>
-                    <Link to="/loyalty"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-amber-600 dark:text-amber-500"><FiAward size={14} /> Rewards</Link>
+                    <Link to="/profile"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors">
+                      <FiUser size={14} className="text-surface-400" /> Profile
+                    </Link>
+                    <Link to="/orders"   className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors">
+                      <FiPackage size={14} className="text-surface-400" /> My Orders
+                    </Link>
+                    <Link to="/loyalty"  className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-amber-600 dark:text-amber-500">
+                      <FiAward size={14} /> Rewards
+                    </Link>
                     {user.role === 'admin' && (
-                      <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-primary-600 dark:text-primary-400"><FiSettings size={14} /> Admin Panel</Link>
+                      <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors text-primary-600 dark:text-primary-400">
+                        <FiSettings size={14} /> Admin Panel
+                      </Link>
                     )}
                     <div className="flex items-center justify-between px-4 py-2.5 sm:hidden">
-                      <span className="text-sm text-surface-600">Dark mode</span>
+                      <span className="text-sm text-surface-600 dark:text-surface-400">Dark mode</span>
                       <button onClick={() => dispatch(toggleDarkMode())}>
-                        {darkMode ? <FiSun className="text-amber-400" size={16} /> : <FiMoon size={16} />}
+                        {darkMode ? <FiSun className="text-amber-400" size={16} /> : <FiMoon size={16} className="text-surface-500" />}
                       </button>
                     </div>
                     <div className="border-t border-surface-100 dark:border-surface-800 mt-1" />
@@ -218,7 +235,7 @@ export default function Navbar() {
                   onChange={e => setSearch(e.target.value)}
                   autoFocus
                   placeholder="Search products..."
-                  className="w-full pl-9 pr-2 py-2.5 text-sm rounded-xl bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:border-primary-400 outline-none"
+                  className="w-full pl-9 pr-2 py-2.5 text-sm rounded-xl bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:border-primary-400 outline-none text-surface-900 dark:text-surface-100"
                 />
               </div>
               <VoiceSearch />
@@ -230,10 +247,7 @@ export default function Navbar() {
         {/* ── Category strip ── */}
         <nav className="bg-primary-700 dark:bg-primary-900 text-white overflow-x-auto scrollbar-hide">
           <div className="page-container flex gap-5 py-2 whitespace-nowrap text-xs font-semibold tracking-wide">
-            <Link
-              to="/products"
-              className="hover:text-primary-200 transition-colors flex-shrink-0"
-            >
+            <Link to="/products" className="hover:text-primary-200 transition-colors flex-shrink-0">
               All Products
             </Link>
             {CATEGORIES.map(cat => (
@@ -252,7 +266,10 @@ export default function Navbar() {
       {/* ── Mobile slide-out menu ── */}
       {mobileMenu && (
         <div className="fixed inset-0 z-40 sm:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenu(false)} />
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setMobileMenu(false)}
+          />
           <div className="absolute left-0 top-0 h-full w-72 bg-white dark:bg-surface-900 shadow-xl flex flex-col animate-slide-in">
             <div className="p-4 border-b border-surface-200 dark:border-surface-700 flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
@@ -270,7 +287,7 @@ export default function Navbar() {
                 <Link
                   key={cat}
                   to={`/products?search=${encodeURIComponent(cat)}`}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"
                 >
                   {cat}
                 </Link>
@@ -280,9 +297,9 @@ export default function Navbar() {
                 <>
                   <div className="divider my-4" />
                   <p className="text-xs text-surface-400 font-bold uppercase tracking-widest mb-3 px-2">Account</p>
-                  <Link to="/profile"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"><FiUser size={16} /> Profile</Link>
-                  <Link to="/orders"   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"><FiPackage size={16} /> My Orders</Link>
-                  <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors"><FiHeart size={16} /> Wishlist</Link>
+                  <Link to="/profile"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"><FiUser size={16} /> Profile</Link>
+                  <Link to="/orders"   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"><FiPackage size={16} /> My Orders</Link>
+                  <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-300"><FiHeart size={16} /> Wishlist</Link>
                   <Link to="/loyalty"  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-amber-600 transition-colors"><FiAward size={16} /> Rewards</Link>
                 </>
               )}
@@ -290,7 +307,10 @@ export default function Navbar() {
 
             {user && (
               <div className="p-4 border-t border-surface-200 dark:border-surface-700">
-                <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-red-500 w-full px-3 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors font-medium">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-sm text-red-500 w-full px-3 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors font-medium"
+                >
                   <FiLogOut size={16} /> Logout
                 </button>
               </div>

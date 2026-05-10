@@ -5,9 +5,7 @@
 @layer base {
   * { box-sizing: border-box; }
 
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
 
   body {
     @apply font-sans bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 transition-colors duration-200;
@@ -22,7 +20,6 @@
 
   h1, h2, h3 { @apply tracking-tight; }
 
-  /* Focus styles */
   *:focus-visible {
     @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-surface-950;
   }
@@ -44,7 +41,7 @@
   .btn-outline {
     @apply inline-flex items-center justify-center gap-2
            border-2 border-primary-500 text-primary-600
-           dark:text-primary-400 dark:border-primary-600
+           dark:text-primary-400 dark:border-primary-500
            hover:bg-primary-50 dark:hover:bg-primary-950
            font-semibold px-4 py-2 rounded-xl
            transition-all duration-200
@@ -152,11 +149,28 @@
   }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-  /* ── Nav link active ── */
+  /* ── Nav link ── */
   .nav-link {
     @apply text-surface-600 dark:text-surface-400
            hover:text-primary-600 dark:hover:text-primary-400
            font-medium transition-colors;
+  }
+
+  /* ── Footer theme-aware ── */
+  .footer-bg {
+    @apply bg-surface-900 dark:bg-surface-950;
+  }
+  .footer-text {
+    @apply text-surface-400 dark:text-surface-500;
+  }
+  .footer-heading {
+    @apply text-white dark:text-surface-100;
+  }
+  .footer-link {
+    @apply text-surface-400 hover:text-primary-400 dark:text-surface-500 dark:hover:text-primary-400 transition-colors duration-200;
+  }
+  .footer-border {
+    @apply border-surface-700 dark:border-surface-800;
   }
 }
 

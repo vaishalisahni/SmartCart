@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiShoppingCart, FiMail, FiPhone, FiMapPin, FiHeart } from 'react-icons/fi';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+
   return (
-    <footer className="bg-surface-900 dark:bg-surface-950 text-surface-400 mt-20">
+    <footer className="bg-surface-900 dark:bg-surface-950 mt-20">
       <div className="page-container py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
         {/* Brand */}
@@ -15,13 +16,19 @@ export default function Footer() {
             </div>
             <span className="font-display text-white font-bold text-xl tracking-tight">SmartCart</span>
           </div>
-          <p className="text-sm leading-relaxed text-surface-500 mb-5">
+          <p className="text-sm leading-relaxed text-surface-400 mb-5">
             AI-powered e-commerce built on MERN stack. Smart, fast, and personalised shopping for everyone.
           </p>
           <div className="flex flex-col gap-2 text-xs text-surface-500">
-            <span className="flex items-center gap-2"><FiMail size={12} /> support@smartcart.in</span>
-            <span className="flex items-center gap-2"><FiPhone size={12} /> +91 98765 43210</span>
-            <span className="flex items-center gap-2"><FiMapPin size={12} /> Dehradun, Uttarakhand</span>
+            <span className="flex items-center gap-2 text-surface-400">
+              <FiMail size={12} className="text-primary-400" /> support@smartcart.in
+            </span>
+            <span className="flex items-center gap-2 text-surface-400">
+              <FiPhone size={12} className="text-primary-400" /> +91 98765 43210
+            </span>
+            <span className="flex items-center gap-2 text-surface-400">
+              <FiMapPin size={12} className="text-primary-400" /> Dehradun, Uttarakhand
+            </span>
           </div>
         </div>
 
@@ -38,7 +45,9 @@ export default function Footer() {
               ['Clothing',      '/products?search=Clothing'],
             ].map(([label, to]) => (
               <li key={label}>
-                <Link to={to} className="hover:text-primary-400 transition-colors duration-200">{label}</Link>
+                <Link to={to} className="text-surface-400 hover:text-primary-400 transition-colors duration-200">
+                  {label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -56,7 +65,9 @@ export default function Footer() {
               ['Rewards',     '/loyalty'],
             ].map(([label, to]) => (
               <li key={label}>
-                <Link to={to} className="hover:text-primary-400 transition-colors duration-200">{label}</Link>
+                <Link to={to} className="text-surface-400 hover:text-primary-400 transition-colors duration-200">
+                  {label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -67,15 +78,17 @@ export default function Footer() {
           <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">Info</h4>
           <ul className="space-y-3 text-sm">
             {[
-              ['About Us',        '/'],
-              ['Privacy Policy',  '/'],
-              ['Terms of Service','/'],
-              ['Shipping Policy', '/'],
-              ['Return Policy',   '/'],
-              ['Contact Us',      '/'],
+              ['About Us',         '/'],
+              ['Privacy Policy',   '/'],
+              ['Terms of Service', '/'],
+              ['Shipping Policy',  '/'],
+              ['Return Policy',    '/'],
+              ['Contact Us',       '/'],
             ].map(([label, to]) => (
               <li key={label}>
-                <Link to={to} className="hover:text-primary-400 transition-colors duration-200">{label}</Link>
+                <Link to={to} className="text-surface-400 hover:text-primary-400 transition-colors duration-200">
+                  {label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -83,13 +96,16 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-surface-800 py-5">
-        <div className="page-container flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-surface-600">
+      <div className="border-t border-surface-700 dark:border-surface-800 py-5">
+        <div className="page-container flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-surface-500">
           <p>© {year} SmartCart — B.Tech AI & ML Major Project | Shivalik College of Engineering</p>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 text-surface-400">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse-soft" />
               All systems operational
+            </span>
+            <span className="flex items-center gap-1 text-surface-500">
+              Made with <FiHeart size={11} className="text-red-400 mx-0.5" fill="currentColor" /> in India
             </span>
           </div>
         </div>
