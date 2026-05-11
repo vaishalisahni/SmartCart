@@ -20,8 +20,17 @@ const protect = async (req, res, next) => {
   }
 };
 
+// Allows both admin and super_admin into the panel
 const admin = (req, res, next) => {
-  if (req.user?.role !== 'admin') return res.status(403).json({ message: 'Admin access required' });
+  if (!['admin', 'super_admin'].includes(req.user?.role))
+    return res.status(403).json({ message: 'Admin access required' });
+  next();
+};
+
+// Only super_admin passes
+const superAdmin = (req, res, next) => {
+  if (req.user?.role !== 'super_admin')
+    return res.status(403).json({ message: 'Super admin access required' });
   next();
 };
 
@@ -39,4 +48,4 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
-module.exports = { protect, admin, optionalAuth };
+module.exports = { protect, admin, superAdmin, optionalAuth };

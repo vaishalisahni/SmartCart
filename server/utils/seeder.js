@@ -69,7 +69,7 @@ const seed = async () => {
 
   // ── Users ────────────────────────────────────────────────────
   await User.create([
-    { name: 'Admin',     email: 'admin@smartcart.com',  password: 'admin123',  role: 'admin',  isVerified: true, referralCode: 'ADMIN001' },
+    { name: 'Admin', email: 'admin@smartcart.com', password: 'admin123', role: 'super_admin', isVerified: true, referralCode: 'ADMIN001' },
     { name: 'Test User', email: 'user@smartcart.com',   password: 'user123',   role: 'user',   isVerified: true, referralCode: 'USER0001' },
     { name: 'Seller',    email: 'seller@smartcart.com', password: 'seller123', role: 'seller', isVerified: true, referralCode: 'SELL0001',
       sellerProfile: { storeName: 'Demo Store', storeDescription: 'Quality products', approved: true } },

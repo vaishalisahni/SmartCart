@@ -198,7 +198,7 @@ export default function Navbar() {
                     <Link to="/loyalty" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-amber-600 dark:text-amber-400">
                       <FiAward size={14} /> Rewards
                     </Link>
-                    {user.role === 'admin' && (
+                    {['admin', 'super_admin'].includes(user.role) && (
                       <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-primary-600 dark:text-primary-400">
                         <FiSettings size={14} /> Admin Panel
                       </Link>

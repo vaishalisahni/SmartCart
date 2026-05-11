@@ -6,7 +6,7 @@ const { Review, Coupon } = require('../models/Others');
 // Dashboard stats
 exports.getDashboard = async (req, res) => {
   const [totalUsers, totalProducts, totalOrders, orders] = await Promise.all([
-    User.countDocuments({ role: 'user' }),
+    User.countDocuments({ role: { $ne: 'super_admin' } }),
     Product.countDocuments({ isActive: true }),
     Order.countDocuments(),
     Order.find().select('totalPrice createdAt orderStatus'),
@@ -51,8 +51,12 @@ exports.updateOrderStatus = async (req, res) => {
 // All users
 exports.getAllUsers = async (req, res) => {
   const { page = 1, limit = 20 } = req.query;
-  const total = await User.countDocuments({ role: 'user' });
-  const users = await User.find({ role: 'user' }).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(Number(limit));
+  const query = { role: { $ne: 'super_admin' } };
+  const total = await User.countDocuments(query);
+  const users = await User.find(query)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
   res.json({ success: true, users, total });
 };
 
@@ -89,4 +93,16 @@ exports.validateCoupon = async (req, res) => {
     ? Math.min(cartTotal * coupon.discountValue / 100, coupon.maxDiscount || Infinity)
     : coupon.discountValue;
   res.json({ success: true, coupon, discount });
+};
+
+exports.updateUserRole = async (req, res) => {
+  if (req.user?.role !== 'super_admin')
+    return res.status(403).json({ message: 'Only super admins can change roles' });
+  const { role } = req.body;
+  const allowed = ['user', 'admin', 'seller'];
+  if (!allowed.includes(role))
+    return res.status(400).json({ message: 'Invalid role' });
+  const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  res.json({ success: true, user });
 };

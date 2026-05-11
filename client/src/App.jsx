@@ -44,8 +44,14 @@ const ProtectedRoute = ({ children }) => {
 
 const AdminRoute = ({ children }) => {
   const { user, initialized } = useSelector(s => s.auth);
-  if (!initialized) return null;
-  return user?.role === 'admin' ? children : <Navigate to="/" replace />;
+  if (!initialized) return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+  return ['admin', 'super_admin'].includes(user?.role)
+    ? children
+    : <Navigate to="/" replace />;
 };
 
 export default function App() {
