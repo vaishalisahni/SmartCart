@@ -35,6 +35,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminAddProduct from './pages/admin/AdminAddProduct';
 import AdminChat from './pages/admin/AdminChat';
+import AdminReturns from './pages/admin/AdminReturns';
 
 const ProtectedRoute = ({ children }) => {
   const { user, initialized } = useSelector(s => s.auth);
@@ -82,6 +83,7 @@ export default function App() {
           <Route path="users" element={<AdminUsers />} />
           <Route path="coupons" element={<AdminCoupons />} />
           <Route path="chat" element={<AdminChat />} />
+          <Route path="returns" element={<AdminReturns />} />
         </Route>
 
         {/* Auth pages — NO navbar, fullscreen */}
