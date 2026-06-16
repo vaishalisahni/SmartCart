@@ -102,7 +102,7 @@ export default function SellerRegister() {
               <input
                 value={form.storeName}
                 onChange={e => setForm(f => ({ ...f, storeName: e.target.value }))}
-                placeholder="e.g. Roshni's Electronics"
+                placeholder="e.g. Bajaj Electronics"
                 className="input"
                 required
               />

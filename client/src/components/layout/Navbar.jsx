@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   FiShoppingCart, FiHeart, FiUser, FiSearch, FiMoon, FiSun,
-  FiMenu, FiX, FiLogOut, FiPackage, FiSettings, FiAward, FiChevronDown,
+  FiMenu, FiX, FiLogOut, FiPackage, FiSettings, FiAward, FiChevronDown, FiShoppingBag,
 } from 'react-icons/fi';
 import { toggleDarkMode } from '../../store/slices/uiSlice';
 import { logoutUser } from '../../store/slices/authSlice';
@@ -198,6 +198,11 @@ export default function Navbar() {
                     <Link to="/loyalty" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-amber-600 dark:text-amber-400">
                       <FiAward size={14} /> Rewards
                     </Link>
+                    {user?.role === 'user' && (
+                      <Link to="/seller/register" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-primary-600 dark:text-primary-400">
+                        <FiShoppingBag size={14} /> Become a Seller
+                      </Link>
+                    )}
                     {['admin', 'super_admin'].includes(user.role) && (
                       <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-primary-600 dark:text-primary-400">
                         <FiSettings size={14} /> Admin Panel
@@ -319,6 +324,11 @@ export default function Navbar() {
                   <Link to="/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiPackage size={16} /> My Orders</Link>
                   <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-surface-700 dark:text-surface-200"><FiHeart size={16} /> Wishlist</Link>
                   <Link to="/loyalty" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors"><FiAward size={16} /> Rewards</Link>
+                  {user?.role === 'user' && (
+                    <Link to="/seller/register" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium transition-colors text-primary-600 dark:text-primary-400">
+                      <FiShoppingBag size={16} /> Become a Seller
+                    </Link>
+                  )}
                 </>
               )}
             </div>
