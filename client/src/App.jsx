@@ -37,6 +37,13 @@ import AdminAddProduct from './pages/admin/AdminAddProduct';
 import AdminChat from './pages/admin/AdminChat';
 import AdminReturns from './pages/admin/AdminReturns';
 
+import SellerLayout from './components/seller/SellerLayout';
+import SellerRegister from './pages/SellerRegister';
+import SellerDashboard from './pages/seller/SellerDashboard';
+import SellerProducts from './pages/seller/SellerProducts';
+import SellerAddProduct from './pages/seller/SellerAddProduct';
+import SellerOrders from './pages/seller/SellerOrders';
+
 const ProtectedRoute = ({ children }) => {
   const { user, initialized } = useSelector(s => s.auth);
   if (!initialized) return <div className="flex items-center justify-center h-screen"><div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" /></div>;
@@ -53,6 +60,18 @@ const AdminRoute = ({ children }) => {
   return ['admin', 'super_admin'].includes(user?.role)
     ? children
     : <Navigate to="/" replace />;
+};
+
+const SellerRoute = ({ children }) => {
+  const { user, initialized } = useSelector(s => s.auth);
+  if (!initialized) return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+  return ['seller', 'admin', 'super_admin'].includes(user?.role)
+    ? children
+    : <Navigate to="/seller/register" replace />;
 };
 
 export default function App() {
@@ -91,6 +110,25 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
+        <Route
+          path="/seller/register"
+          element={<ProtectedRoute><SellerRegister /></ProtectedRoute>}
+        />
+
+        <Route
+          path="/seller"
+          element={
+            <SellerRoute>
+              <SellerLayout />
+            </SellerRoute>
+          }
+        >
+          <Route index element={<SellerDashboard />} />
+          <Route path="products" element={<SellerProducts />} />
+          <Route path="products/add" element={<SellerAddProduct />} />
+          <Route path="products/edit/:id" element={<SellerAddProduct />} />
+          <Route path="orders" element={<SellerOrders />} />
+        </Route>
 
         {/* All other pages — WITH navbar */}
         <Route path="/*" element={

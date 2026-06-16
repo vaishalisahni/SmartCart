@@ -203,6 +203,14 @@ export default function Navbar() {
                         <FiSettings size={14} /> Admin Panel
                       </Link>
                     )}
+                    {['seller', 'admin', 'super_admin'].includes(user.role) && (
+                      <Link
+                        to="/seller"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-primary-600 dark:text-primary-400"
+                      >
+                        <FiShoppingBag size={14} /> Seller Panel
+                      </Link>
+                    )}
                     <div className="flex items-center justify-between px-4 py-2.5 sm:hidden">
                       <span className="text-sm text-surface-600 dark:text-surface-300">Dark mode</span>
                       <button onClick={() => dispatch(toggleDarkMode())}>

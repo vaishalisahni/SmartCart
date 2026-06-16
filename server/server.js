@@ -86,6 +86,7 @@ app.use('/api/payment',   require('./routes/paymentRoutes'));
 app.use('/api/chat',      require('./routes/chatRoutes'));
 app.use('/api/loyalty',   require('./routes/loyaltyRoutes'));
 app.use('/api/returns', require('./routes/returnRoutes'));
+app.use('/api/seller', require('./routes/sellerRoutes'));
 
 // ── Socket.IO chat ────────────────────────────────────────────
 require('./chat/chatHandler')(io);
